@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.*;
 import java.nio.*;
+import java.text.MessageFormat;
 import java.util.Date;
 import org.apache.http.client.utils.DateUtils;
 
@@ -34,7 +35,7 @@ public class WebServer {
     public void start() throws IOException {
         while (true) {
 
-            Socket sohkahtoa= this.waitForConnection();
+            Socket sohkahtoa = this.waitForConnection();
 
             if (sohkahtoa != null)
             {
@@ -73,27 +74,21 @@ public class WebServer {
     /**
      * Probably a method which is fired as a new thread?
      */
-    private void acceptConnection(Socket sock)
+    private void acceptConnection(Socket sock) throws IOException,  MessageFormatException
     {
         // thread gets its own request handler.
         RequestHandler requestHandler;
 
-        // thread gets all the stuff for logging.
-        int requestType = 0;
-        int uri = 0;
-        int responsecode = 0;
-
         // Thread has its own Input and Output Streams4
-        OutputStream os = conn.getOutputStream();
-        InputStream is = conn.getInputStream();
+        OutputStream os = sock.getOutputStream();
+        InputStream is = sock.getInputStream();
 
-        // DETECT WHICH TYPE
-            // RequestHandler = HeadHandler;
-        // OR
-            // RequestHandler = GetHandler;
-        // OR
-            // RequestHandler = PutHandler;
-//}
+        RequestMessage msg = RequestMessage.parse(is);
+        RequestHandler thisOne = RequestHandlerFactory.createRequest(msg.getMethod());
+
+        ResponseMessage rspMsg = new ResponseMessage(thisOne.getResponse());
+
+
 
         // HANDLE ANY ERRORS AND RETURNS ETC....
         try {
@@ -101,30 +96,19 @@ public class WebServer {
         } catch (MessageFormatException ee) {
             throw new HTTPException(403);
         }
-        EmptyMessageException em = new EmptyMessageException();
-        StatusCodes s = new StatusCodes();
-        int code =  httpexcetp.getcode
 
-
-//            System.out.print(m.getStartLine());
-//            int c = is.read();
-//            while ( c > 0 ){
-//
-//             System.out.print((char)c);
-//                c = is.read();
-//            }
-            // send a response
-            responsecode = code;
-            ResponseMessage msg = new OurResponseMessage(m, code);
-            this.addHeadersToResponse(msg);
-            msg.write(os);
-            os.write(e.getLocalizedMessage().getBytes());
+        this.addHeadersToResponse(msg);
+        msg.write(os);
+        os.write(e.getLocalizedMessage().getBytes());
 
         // Close this and the thread ends.
-            conn.close();
-
+        sock.close();
     }
 
+    /**
+     * Method which handles File stuff, for any requests involving files.
+     * @throws HTTPException
+     */
     public void doStuffwithfile() throws HTTPException{
         try {
             FileHandle c = FileHandler(path); //throws 403 and 400
@@ -134,6 +118,10 @@ public class WebServer {
         }
     }
 
+    /**
+     * Method which handles adding headers to the returned response.
+     * @param r
+     */
     public void addHeadersToResponse(ResponseMessage r){
         r.addHeaderField("Date","123123123");
     }
