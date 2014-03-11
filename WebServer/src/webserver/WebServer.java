@@ -76,7 +76,7 @@ public class WebServer {
 //                c = is.read();
 //            }
             // send a response
-        responsecode = code;
+        responsecode = cod;
             ResponseMessage msg = new OurResponseMessage(m, code);
              this.addHeadersToResponse(msg);
             msg.write(os);
