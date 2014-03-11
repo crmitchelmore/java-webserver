@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/WebServer/dist/lib/IN2011HTTP.jar!/" />
+      <root url="jar://$PROJECT_DIR$/WebServer/dist/lib/apache-dateutils.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
