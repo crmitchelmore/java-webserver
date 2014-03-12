@@ -21,51 +21,89 @@ public class WebServer {
     private String rootDir;
     private boolean logging;
 
-
     public WebServer(int port, String rootDir, boolean logging) {
         this.port = port;
         this.rootDir = rootDir;
         this.logging = logging;
     }
 
-    class{
-        statusCode : 404;
-    }
+    /**
+     * Method which runs continuously and fires of new threads as and when required.
+     * @throws IOException
+     */
     public void start() throws IOException {
-        ServerSocket serverSock = new ServerSocket(port);
-        int requestType,uri,responsecode = 0;
         while (true) {
 
-          try {
-            try {
-                throw new EmptyMessageException("Empty....");
-                this.addHeadersToResponse(msg);
+            Socket sohkahtoa= this.waitForConnection();
 
-
-               this.doStuffwithfile();
-
-
-
-            } catch ( HTTPException e ){
-
-
-            //e.getCause() =  \"File not found""
-
-
-            // listen for a new connection on the server socket
-            Socket conn = serverSock.accept();
-            // get the output stream for sending data to the client
-            OutputStream os = conn.getOutputStream();
-            InputStream is = conn.getInputStream();
-            RequestMessage m = null;
-            try {
-                 m = RequestMessage.parse(is);
-            } catch (MessageFormatException ee) {
-                throw new HTTPException(403);
+            if (sohkahtoa != null)
+            {
+                // perhaps this part here starts a new thread, within the while loop.
+                // thread.run(this.acceptConnection);
+                this.acceptConnection(sohkahtoa);
             }
-            EmptyMessageException em = new EmptyMessageException();
-            StatusCodes s = new StatusCodes();
-           int code =  httpexcetp.getcode
+            else
+            {
+                // handle what happens when the socket fails?
+            }
+        }
+    }
+
+    /**
+     * The method which waits for the connection, and returns TRUE if a connection is found.
+     *
+     * Or perhaps it should return the actual connection, or some useful information, to then pass into "AcceptConnection"
+     * @return -- Not sure just yet.
+     */
+    private Socket waitForConnection() {
+        try {
+            ServerSocket serverSock = new ServerSocket(port);
+            Socket sock = serverSock.accept();
+            return sock;
+        }
+        catch(IOException e)
+        {
+            // something went wrong with creating the server socket.
+        }
+
+        // only happens when exception is thrown, so perhaps could be handled better.
+        return null;
+    }
+
+    /**
+     * Probably a method which is fired as a new thread?
+     */
+    private void acceptConnection(Socket sock)
+    {
+        // thread gets its own request handler.
+        RequestHandler requestHandler;
+
+        // thread gets all the stuff for logging.
+        int requestType = 0;
+        int uri = 0;
+        int responsecode = 0;
+
+        // Thread has its own Input and Output Streams4
+        OutputStream os = conn.getOutputStream();
+        InputStream is = conn.getInputStream();
+
+        // DETECT WHICH TYPE
+            // RequestHandler = HeadHandler;
+        // OR
+            // RequestHandler = GetHandler;
+        // OR
+            // RequestHandler = PutHandler;
+//}
+
+        // HANDLE ANY ERRORS AND RETURNS ETC....
+        try {
+            m = RequestMessage.parse(is);
+        } catch (MessageFormatException ee) {
+            throw new HTTPException(403);
+        }
+        EmptyMessageException em = new EmptyMessageException();
+        StatusCodes s = new StatusCodes();
+        int code =  httpexcetp.getcode
 
 
 //            System.out.print(m.getStartLine());
@@ -76,60 +114,27 @@ public class WebServer {
 //                c = is.read();
 //            }
             // send a response
-        responsecode = code;
+            responsecode = code;
             ResponseMessage msg = new OurResponseMessage(m, code);
-             this.addHeadersToResponse(msg);
+            this.addHeadersToResponse(msg);
             msg.write(os);
             os.write(e.getLocalizedMessage().getBytes());
 
+        // Close this and the thread ends.
             conn.close();
 
-            }
-        }
-
-        }
-
-        catch (Exception e){
-            //500
-        } finally {
-           if ( logging enabled ){ logThatShit(requestType,uri,responsecode);}
-        }
-
     }
-public void doStuffwithfile() throws HTTPException{
-    try {
-        FileHandle c = FileHandler(path); //throws 403 and 400
-        c.save; //404
-    } catch ( IOException asd ){
-        throw new HTTPException(404);
+
+    public void doStuffwithfile() throws HTTPException{
+        try {
+            FileHandle c = FileHandler(path); //throws 403 and 400
+            c.save; //404
+        } catch ( IOException asd ){
+            throw new HTTPException(404);
+        }
     }
-}
 
     public void addHeadersToResponse(ResponseMessage r){
         r.addHeaderField("Date","123123123");
-    }
-    public static void main(String[] args) throws IOException {
-        String usage = "Usage: java webserver.WebServer <port-number> <root-dir> (\"0\" | \"1\")";
-
-        if (args.length != 3) {
-            throw new Error(usage);
-        }
-        int port;
-        try {
-            port = Integer.parseInt(args[0]);
-        } catch (NumberFormatException e) {
-            throw new Error(usage + "\n" + "<port-number> must be an integer");
-        }
-        String rootDir = args[1];
-        boolean logging;
-        if (args[2].equals("0")) {
-            logging = false;
-        } else if (args[2].equals("1")) {
-            logging = true;
-        } else {
-            throw new Error(usage);
-        }
-        WebServer server = new WebServer(port, rootDir, logging);
-        server.start();
     }
 }
