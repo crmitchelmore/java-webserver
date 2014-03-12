@@ -6,6 +6,8 @@ import org.apache.http.client.utils.DateUtils;
 import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
@@ -18,44 +20,43 @@ public class FileHandler {
 
     private Path rootDirectory;
     private Path absolutePath;
-    private String decodedURI;
-/*
+    private URI decodedURI;
+
     public void check(){
-        //Get or head
+
         Date lastModified = new Date(98l);
         if ( !isValid() ){
             throw new HTTPException(403);//Forbidden
-        }else if ( !fileExists() ){
-            throw new HTTPException(404);//Not Found
-        }else if ( lastModified && !isFileModifiedSince(lastModified) ){
-            //304 Not modified
-        }else if ( !canReadFile() ){
-            throw new HTTPException(500);//Can't read file. Maybe should be something else
-        }else{
-            //200
+        }else if ( true ) { // get or head
+            if ( !fileExists() ){
+                throw new HTTPException(404);//Not Found
+            }else if ( lastModified && !isFileModifiedSince(lastModified) ){
+                //304 Not modified
+            }else if ( !canReadFile() ){
+                throw new HTTPException(500);//Can't read file. Maybe should be something else
+            }else{
+                //200
                 //if get
                 byte[] bytes = theFile();
                 //add header
                 String mimeType = mimeType();
                 String fileSize = "" + bytes.length;
 
+            }
+        }else if ( true ){//put
+            byte[] bytes = null;
+            createFileOrFolderWithBytes(bytes);
         }
-
-        //Put
-
-
     }
-    */
 
-    public FileHandler(String rootDirectory, String uri) throws UnsupportedEncodingException { //throw new HTTPException(400);//Bad Request
+
+    public FileHandler(String rootDirectory, String uri) throws URISyntaxException { //throw new HTTPException(400);//Bad Request
         this.rootDirectory = Paths.get(rootDirectory);
-        this.decodedURI = URLDecoder.decode(uri, "ISO-8859-1");
-        this.absolutePath = this.rootDirectory.resolve(this.decodedURI).normalize();
+        //URLDecoder.decode(uri, "ISO-8859-1");
+        this.decodedURI = new URI(uri);
+        this.absolutePath = this.rootDirectory.resolve(this.decodedURI.toString()).normalize();
     }
 
-    private long fileSize() throws IOException{//maybe use size of byte array?
-        return Files.size(this.absolutePath);
-    }
 
 
     private boolean isValid(){
@@ -83,8 +84,22 @@ public class FileHandler {
         return false;
     }
 
-    public void createFile(){
+    public void createFileOrFolderWithBytes(byte[] bytes) throws IOException{
         //atomic...
+        Path decodedURIPath = Paths.get(this.decodedURI);
+        int pathComponents = decodedURIPath.getNameCount();
+        if ( pathComponents > 1 ){
+            Path directoryStructure = decodedURIPath.subpath(0, pathComponents-1);
+            Files.createDirectories(this.rootDirectory.resolve(directoryStructure));
+        }
+        if ( true ){//file
+            if ( bytes != null ){
+                Files.write(this.absolutePath, bytes);
+            }
+        }else{//folder
+            Files.createDirectory(this.absolutePath);
+        }
+
     }
 
     public byte[] theFile() throws IOException{
@@ -126,22 +141,26 @@ public class FileHandler {
 
     public String directoryStructure() throws IOException{
         DirectoryStream<Path> stream = null;
+        String s = null;
         try {
-            StringBuilder builder = new StringBuilder("<html>\n<head><title>");
-            builder.append(this.decodedURI);
-            builder.append("</title></head>\n<body><h1>");
-            builder.append(this.decodedURI);
-            builder.append("</h1><br>");
+            StringBuilder builder = new StringBuilder("<html>\n<head><title>" + this.decodedURI + "</title></head>\n");
+
+            builder.append("<body>\n<h1>" + this.decodedURI + "</h1><br>");
+
             stream = Files.newDirectoryStream(this.absolutePath);
             for (Path file: stream) {
                 builder.append("<a href=\"" + file.toString() + "\">" + file.toString() + "</a><br>");
 
                 System.out.println(file.getFileName());
             }
+
+            builder.append("</body>\n</html>");
+            s = builder.toString();
         } finally {
             if ( stream != null ){
                 stream.close();
             }
         }
+        return s;
     }
 }
