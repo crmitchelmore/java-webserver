@@ -81,10 +81,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="WebServer.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="WebServer.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/WebServer/src/webserver/WebServer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="106" column="5" selection-start="2790" selection-end="2790" vertical-scroll-proportion="0.3119266" vertical-offset="1352" max-vertical-offset="2115">
+            <state line="106" column="0" selection-start="2785" selection-end="2785" vertical-scroll-proportion="0.0" vertical-offset="1590" max-vertical-offset="2115">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FileHandler.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/WebServer/src/webserver/FileHandler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="21" column="2" selection-start="525" selection-end="525" vertical-scroll-proportion="-0.29750982" vertical-offset="542" max-vertical-offset="2295">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -112,6 +121,7 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/WebServer/src/webserver/WebServer.java" />
+        <option value="$PROJECT_DIR$/WebServer/src/webserver/FileHandler.java" />
       </list>
     </option>
   </component>
@@ -120,6 +130,22 @@
     <option name="y" value="31" />
     <option name="width" value="1400" />
     <option name="height" value="860" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>Abstraction issues</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -132,7 +158,7 @@
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectReloadState">
-    <option name="STATE" value="0" />
+    <option name="STATE" value="2" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
@@ -147,8 +173,8 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -286,7 +312,7 @@
     <property name="MemberChooser.sorted" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="MemberChooser.copyJavadoc" value="false" />
-    <property name="options.lastSelected" value="project.propCompiler" />
+    <property name="options.lastSelected" value="preferences.sourceCode" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
@@ -537,7 +563,14 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/WebServer/src/webserver/WebServer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="99" column="9" selection-start="2620" selection-end="2620" vertical-scroll-proportion="0.0" vertical-offset="1425" max-vertical-offset="2115">
+        <state line="106" column="0" selection-start="2785" selection-end="2785" vertical-scroll-proportion="0.0" vertical-offset="1590" max-vertical-offset="2115">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/WebServer/src/webserver/FileHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="58" column="27" selection-start="1599" selection-end="1599" vertical-scroll-proportion="0.0" vertical-offset="317" max-vertical-offset="1125">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -553,10 +586,36 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/WebServer/src/webserver/WebServer.java">
       <provider selected="true" editor-type-id="text-editor">
+        <state line="106" column="5" selection-start="2790" selection-end="2790" vertical-scroll-proportion="0.0" vertical-offset="1352" max-vertical-offset="2115">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home/src.zip!/java/net/Socket.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="892" column="0" selection-start="34914" selection-end="34914" vertical-scroll-proportion="0.0" vertical-offset="13380" max-vertical-offset="25215">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/WebServer/src/webserver/WebServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="99" column="9" selection-start="2620" selection-end="2620" vertical-scroll-proportion="0.0" vertical-offset="1425" max-vertical-offset="2115">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home/src.zip!/java/net/Socket.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="892" column="0" selection-start="34914" selection-end="34914" vertical-scroll-proportion="0.0" vertical-offset="13380" max-vertical-offset="25215">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/WebServer/src/webserver/WebServer.java">
+      <provider selected="true" editor-type-id="text-editor">
         <state line="27" column="32" selection-start="703" selection-end="703" vertical-scroll-proportion="0.0" vertical-offset="165" max-vertical-offset="1515">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -579,9 +638,7 @@
     </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home/src.zip!/javax/xml/ws/http/HTTPException.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="13" selection-start="501" selection-end="501" vertical-scroll-proportion="0.33266932" vertical-offset="28" max-vertical-offset="555">
-          <folding />
-        </state>
+        <state line="36" column="13" selection-start="501" selection-end="501" vertical-scroll-proportion="0.33266932" vertical-offset="28" max-vertical-offset="555" />
       </provider>
     </entry>
     <entry file="jar://$PROJECT_DIR$/IN2011HTTP.jar!/in2011/http/Message.class">
@@ -598,13 +655,47 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/WebServer/src/webserver/WebServer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="106" column="5" selection-start="2790" selection-end="2790" vertical-scroll-proportion="0.3119266" vertical-offset="1352" max-vertical-offset="2115">
+        <state line="106" column="0" selection-start="2785" selection-end="2785" vertical-scroll-proportion="0.0" vertical-offset="1202" max-vertical-offset="2115">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/WebServer/src/webserver/FileHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="2" selection-start="525" selection-end="525" vertical-scroll-proportion="-0.29750982" vertical-offset="542" max-vertical-offset="2295">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ProjectJDKs.UI">
+        <settings>
+          <last-edited>1.7</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
   </component>
 </project>
 
