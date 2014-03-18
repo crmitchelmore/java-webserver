@@ -88,27 +88,40 @@ public class WebServer {
 
             // Thread creates a response message by parsing the input stream
             RequestMessage msg = RequestMessage.parse(is);
-
+            ResponseMessage rspMsg = null;
             // We create a request handler, based on the request made by the user
-            RequestHandler thisOne = RequestHandlerFactory.createRequest(msg, rootDir);
+            RequestHandler thisOne = null;
+            try {
+                RequestHandlerFactory.createRequest(msg, rootDir);
 
-            // We create a response message, by calling the method GetResponse
-            // which handles parsing the given response
-            ResponseMessage rspMsg = new ResponseMessage(thisOne.getResponse());
+                // We create a response message, by calling the method GetResponse
+                // which handles parsing the given response
+                rspMsg =   new ResponseMessage(thisOne.getResponse());
 
-            // We add the headers to the response message
-            for(Map.Entry<String, String> ent : thisOne.getResponseHeaders().entrySet())
-            {
-                rspMsg.addHeaderField(ent.getKey(), ent.getValue());
+                // We add the headers to the response message
+                for(Map.Entry<String, String> ent : thisOne.getResponseHeaders().entrySet())
+                {
+                    rspMsg.addHeaderField(ent.getKey(), ent.getValue());
+                }
+
+
+            }catch (HTTPException httpException){
+
+                    rspMsg = new ResponseMessage(httpException.getStatusCode());
+
+
             }
+
+
 
             //Write the response message
             rspMsg.write(os);
             os.write(thisOne.getResponseBody());
 
             // Close this and the thread ends.
-            sock.close();
+
         }
+
         catch (IOException ioe)
         {
             // this COULD be handled, to prevent further execution
@@ -118,6 +131,12 @@ public class WebServer {
         catch (MessageFormatException mfe)
         {
             // something
+        }finally {
+            try {
+                sock.close();
+            }catch (IOException e){
+                //Game over
+            }
         }
     }
 

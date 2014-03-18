@@ -63,6 +63,7 @@ public class FileRequest {
     public FileRequest(String rootDirectory, String uri) throws URISyntaxException, SecurityException //throw new ;//Bad Request
     {
         this.rootDirectory = Paths.get(rootDirectory);
+        uri = uri.substring(1);
         //The URI is not using the correct syntax .Throws URISyntaxException
         this.decodedURI = new URI(uri);
         this.absolutePath = this.rootDirectory.resolve(this.decodedURI.toString()).normalize();
