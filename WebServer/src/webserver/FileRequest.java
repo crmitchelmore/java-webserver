@@ -134,12 +134,14 @@ public class FileRequest {
             builder.append("<body>\n<h1>" + this.getDecodedURI() + "</h1><br>");
 
             stream = Files.newDirectoryStream(this.absolutePath);
-            int rootPathCount = this.absolutePath.getNameCount();
+            int rootPathCount = this.rootDirectory.getNameCount() + 1;
+            int absolutePathCount = this.absolutePath.getNameCount();
             for (Path file: stream) {
-                Path resolved = file.subpath(rootPathCount, file.getNameCount());
+                Path resolved = file.subpath(absolutePathCount, file.getNameCount());
+                Path resolvedTarget = file.subpath(rootPathCount, file.getNameCount());
                 String directory = Files.isDirectory(file) ? "Dir: " : "";
                 if ( !Files.isSymbolicLink(resolved) ){
-                    builder.append(directory + "<a href=\"" + resolved.toString() + "\">" + resolved.toString() + "</a><br>");
+                    builder.append(directory + "<a href=\"" + resolvedTarget.toString() + "\">" + resolved.toString() + "</a><br>");
                 }
 
             }
@@ -165,7 +167,8 @@ public class FileRequest {
         try {
             return Files.probeContentType(this.absolutePath);
         } catch (IOException x) {
-            System.err.println(x);
+            type = "Unknown";
+            x.printStackTrace();
         }
         return type;
     }
