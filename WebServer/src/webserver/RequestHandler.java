@@ -2,6 +2,8 @@ package webserver;
 
 import in2011.http.RequestMessage;
 
+import javax.xml.ws.http.HTTPException;
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -11,9 +13,23 @@ public abstract class RequestHandler {
 
     private String uri;
 
-    public RequestHandler(RequestMessage requestMessage)
-    {
+    protected FileRequest fileRequest;
 
+    protected Map<String, String> headers;
+
+    public RequestHandler(RequestMessage requestMessage, String rootDir) throws HTTPException
+    {
+        try {
+            fileRequest = new FileRequest(rootDir, requestMessage.getURI());
+        }
+        catch(URISyntaxException use)
+        {
+            throw new HTTPException(403);
+        }
+        catch (SecurityException se)
+        {
+            throw new HTTPException(400);
+        }
     }
 
     public abstract String getMethod();
