@@ -4,6 +4,7 @@ import in2011.http.RequestMessage;
 
 import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -24,7 +25,7 @@ public abstract class RequestHandler {
         try {
             fileRequest = new FileRequest(rootDir, requestMessage.getURI());
         }
-        catch(URISyntaxException use)
+        catch( UnsupportedEncodingException e)
         {
             throw new HTTPException(403);
         }

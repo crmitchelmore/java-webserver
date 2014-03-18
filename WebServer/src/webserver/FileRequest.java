@@ -3,11 +3,14 @@ package webserver;
 import javax.xml.ws.http.HTTPException;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -18,25 +21,20 @@ public class FileRequest {
 
     protected Path rootDirectory;
     protected Path absolutePath;
-    protected URI decodedURI;
-
-    public URI getDecodedURI() {
-        return decodedURI;
-    }
-
-    public Path getAbsolutePath() {
-        return absolutePath;
-    }
+    protected String decodedURI;
 
 
 
-    public FileRequest(String rootDirectory, String uri) throws URISyntaxException, SecurityException //throw new ;//Bad Request
+
+
+    public FileRequest(String rootDirectory, String uri) throws SecurityException, UnsupportedEncodingException //throw new ;//Bad Request
     {
         this.rootDirectory = Paths.get(rootDirectory);
-        uri = uri.substring(1);
+        uri = uri.substring(1); //Chop the leading
+        this.decodedURI = URLDecoder.decode(uri, "UTF-8"); //Remove hex Maybe use ISO-8859-1
         //The URI is not using the correct syntax .Throws URISyntaxException
-        this.decodedURI = new URI(uri);
-        this.absolutePath = this.rootDirectory.resolve(this.decodedURI.toString()).normalize();
+//        this.decodedURI = new URI(uri);
+        this.absolutePath = this.rootDirectory.resolve(this.decodedURI).normalize();
 
         //File outside the scope of the server directory. Throws SecurityException
         if ( !this.absolutePath.startsWith(rootDirectory) ){
@@ -53,7 +51,7 @@ public class FileRequest {
             return null;
         }
 
-        if ( fileExists() ){ //403?
+        if ( fileExists() ){
             return Files.readAllBytes(this.absolutePath);
         }
         if ( isDirectory() ){
@@ -101,17 +99,37 @@ public class FileRequest {
         try {
             StringBuilder builder = new StringBuilder("<html>\n<head><title>" + this.decodedURI + "</title></head>\n");
 
-            builder.append("<body>\n<h1>" + this.getDecodedURI() + "</h1><br>");
+            builder.append("<body>\n<h1>");
+            builder.append("<a href=\"/\">home</a>");
+
+            Path relativeDirectory = this.rootDirectory.relativize(this.absolutePath);
+            Iterator it = relativeDirectory.iterator();
+            Path partial = Paths.get("/");
+            while( it.hasNext() )
+            {
+                Path p = (Path)it.next();
+                partial = partial.resolve(p);
+                if ( it.hasNext() ){
+                    builder.append(" / <a href=\""+partial+"\"> "+p.toString()+"</a> ");
+                }else {
+                    builder.append(" / "+p.toString());
+                }
+
+            }
+
+            builder.append("</h1><br>");
 
             stream = Files.newDirectoryStream(this.absolutePath);
-            int rootPathCount = this.rootDirectory.getNameCount() + 1;
+
+
             int absolutePathCount = this.absolutePath.getNameCount();
             for (Path file: stream) {
                 Path resolved = file.subpath(absolutePathCount, file.getNameCount());
-                Path resolvedTarget = file.subpath(rootPathCount, file.getNameCount());
+
+                Path resolvedTarget = this.rootDirectory.relativize(file);
                 String directory = Files.isDirectory(file) ? "Dir: " : "";
                 if ( !Files.isSymbolicLink(resolved) ){
-                    builder.append(directory + "<a href=\"" + resolvedTarget.toString() + "\">" + resolved.toString() + "</a><br>");
+                    builder.append(directory + "<a href=\"/" + resolvedTarget.toString() + "\">" + resolved.toString() + "</a><br>");
                 }
 
             }
