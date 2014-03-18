@@ -3,6 +3,7 @@ package webserver;
 import in2011.http.RequestMessage;
 
 import javax.print.DocFlavor;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Map;
@@ -20,9 +21,10 @@ public class GetHandler extends HeadHandler {
 
     }
     @Override
-    public byte[] getResponseBody() {
-        this.fileRequest.getFile();
-        return null;
+    public byte[] getResponseBody() throws IOException{
+
+        return this.fileRequest.getFileBytes();
+
     }
 
     @Override

@@ -3,6 +3,7 @@ package webserver;
 import in2011.http.RequestMessage;
 
 import javax.xml.ws.http.HTTPException;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -36,7 +37,7 @@ public abstract class RequestHandler {
 
     public abstract int getResponse();
 
-    public abstract byte[] getResponseBody();
+    public abstract byte[] getResponseBody() throws IOException;
 
     public abstract HashMap<String, String> getResponseHeaders();
 }

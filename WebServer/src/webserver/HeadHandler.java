@@ -2,6 +2,7 @@ package webserver;
 
 import in2011.http.RequestMessage;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -30,7 +31,7 @@ public class HeadHandler extends RequestHandler {
     }
 
     @Override
-    public byte[] getResponseBody() {
+    public byte[] getResponseBody() throws IOException{
         return null;
     }
 
@@ -47,7 +48,7 @@ public class HeadHandler extends RequestHandler {
         super.headers.put("Content-Type", "");
 
         // last modified
-      String lastModified = simpleDateFormat.format(((ReadFileRequest)fileRequest).lastModified());
+      String lastModified = simpleDateFormat.format(fileRequest.lastModified());
 
         super.headers.put("Last-Modified", lastModified);
 

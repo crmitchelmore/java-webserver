@@ -2,6 +2,8 @@ package webserver;
 
 import in2011.http.RequestMessage;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -9,9 +11,9 @@ import java.util.Map;
  */
 public class PutHandler extends RequestHandler {
 
-    public PutHandler(RequestMessage requestMessage)
+    public PutHandler(RequestMessage requestMessage, String rootDir)
     {
-        super(requestMessage);
+        super(requestMessage, rootDir);
     }
 
     @Override
@@ -26,12 +28,12 @@ public class PutHandler extends RequestHandler {
     }
 
     @Override
-    public String getResponseBody() {
+    public byte[] getResponseBody() throws IOException{
         return null;
     }
 
     @Override
-    public Map<String, String> getResponseHeaders() {
+    public HashMap<String, String> getResponseHeaders() {
         return null;
     }
 }

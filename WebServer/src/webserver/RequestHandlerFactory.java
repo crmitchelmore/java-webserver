@@ -19,15 +19,15 @@ public class RequestHandlerFactory {
         String method = requestMessage.getMethod();
         if (method.equals("HEAD"))
         {
-            return new HeadHandler(requestMessage);
+            return new HeadHandler(requestMessage, rootDir);
         }
         else if(method.equals("GET"))
         {
-            return new GetHandler(requestMessage);
+            return new GetHandler(requestMessage, rootDir);
         }
         else if(method.equals("PUT"))
         {
-            return new PutHandler(requestMessage);
+            return new PutHandler(requestMessage, rootDir);
         }
         else
         {
