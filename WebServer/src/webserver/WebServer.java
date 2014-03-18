@@ -84,7 +84,7 @@ public class WebServer {
         InputStream is = sock.getInputStream();
 
         RequestMessage msg = RequestMessage.parse(is);
-        RequestHandler thisOne = RequestHandlerFactory.createRequest(msg.getMethod());
+        RequestHandler thisOne = RequestHandlerFactory.createRequest(msg);
 
         ResponseMessage rspMsg = new ResponseMessage(thisOne.getResponse());
 

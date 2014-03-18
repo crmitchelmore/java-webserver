@@ -1,14 +1,10 @@
 package webserver;
 
-import com.sun.org.apache.regexp.internal.recompile;
-import org.apache.http.client.utils.DateUtils;
-
 import javax.xml.ws.http.HTTPException;
+import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
 import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
@@ -17,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by cmitchelmore on 11/03/2014.
  */
-public class FileHandler {
+public class FileRequest {
 
     private Path rootDirectory;
     private Path absolutePath;
@@ -27,9 +23,14 @@ public class FileHandler {
     public void check(){
 
         Date lastModified = new Date(98l);
-        if ( !isValid() ){
-            throw new HTTPException(403);//Forbidden
-        }else if ( true ) { // get or head
+        try {
+
+        }catch (URISyntaxException syntaxException){
+            throw new HTTPException(400);
+        } catch (SecurityException securityException){
+            throw new HTTPException(403);
+        }
+         if ( true ) { // get or head
             if ( !fileExists() ){
                 throw new HTTPException(404);//Not Found
             }else if ( lastModified && !isFileModifiedSince(lastModified) ){
@@ -52,44 +53,70 @@ public class FileHandler {
     }
 
 
-    public FileHandler(String rootDirectory, String uri) throws URISyntaxException { //throw new HTTPException(400);//Bad Request
+
+
+
+    public FileRequest(String rootDirectory, String uri) throws URISyntaxException, SecurityException{ //throw new ;//Bad Request
         this.rootDirectory = Paths.get(rootDirectory);
-        //URLDecoder.decode(uri, "ISO-8859-1");
+        //The URI is not using the correct syntax .Throws URISyntaxException
         this.decodedURI = new URI(uri);
         this.absolutePath = this.rootDirectory.resolve(this.decodedURI.toString()).normalize();
+
+        //File outside the scope of the server directory. Throws SecurityException
+        if ( !this.absolutePath.startsWith(rootDirectory) ){
+            throw new SecurityException("Access forbidden");
+        }
     }
 
+    public File getFile(){
+        boolean isSymbolic = Files.isSymbolicLink(this.absolutePath);
 
+        boolean isReadable = Files.isReadable(this.absolutePath);
+        boolean fileExists = Files.exists(this.absolutePath) && Files.isRegularFile(this.absolutePath, LinkOption.NOFOLLOW_LINKS);
 
-    private boolean isValid(){
-        return this.absolutePath.startsWith(rootDirectory);
+        if ( !isSymbolic ){ //403?
+            if ( fileExists ){//Regular file
+                if ( isReadable ){ //Only instantaneous check
+                    return new File(this.absolutePath.toUri());
+                }else {
+                    throw new IOException;//??
+                }
+
+            }else if ( isDirectory() ){
+
+            }
+        }
+
+        //Check if the file has no symbolic links and is not a directory
+        if ( fileExists ){
+            return new File(this.absolutePath.toUri());
+        }
+        throw new ;
     }
 
-    public boolean fileExists(){
-        return Files.exists(this.absolutePath) & Files.isRegularFile(this.absolutePath, LinkOption.NOFOLLOW_LINKS);
-    }
-
-    public boolean canReadFile(){
-        return Files.isReadable(this.absolutePath);
-    }
-
-    public boolean isDirectory(){
+    public boolean isDirectory()
+    {
         return Files.isDirectory(this.absolutePath);
     }
 
-    private boolean hasIndex(){
-        if ( isDirectory() ){
-            Path indexPath = this.absolutePath.resolve("index.html");
-            return Files.exists(indexPath) & Files.isRegularFile(indexPath, LinkOption.NOFOLLOW_LINKS) & Files.isReadable(indexPath);
 
+    public File getFileAtPathIfExists(String pathExtension)
+    {
+        if ( isDirectory() ){
+            Path extendedPath = this.absolutePath.resolve(pathExtension);
+            boolean exists = Files.exists(extendedPath) && Files.isRegularFile(extendedPath, LinkOption.NOFOLLOW_LINKS);
+            if ( exists ){
+                return File()
+            }
         }
-        return false;
+        return null;
     }
+
 
     public void createFileOrFolderWithBytes(byte[] bytes) throws IOException{
         //atomic...
 
-        synchronized ( FileHandler.class ){
+        synchronized ( FileRequest.class ){
 
 
         }

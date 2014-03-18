@@ -1,5 +1,7 @@
 package webserver;
 
+import in2011.http.RequestMessage;
+
 import java.util.*;
 
 /**
@@ -9,7 +11,7 @@ public abstract class RequestHandler {
 
     private String uri;
 
-    public RequestHandler(java.io.InputStream is)
+    public RequestHandler(RequestMessage requestMessage)
     {
 
     }

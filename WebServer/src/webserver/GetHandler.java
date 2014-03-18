@@ -1,5 +1,7 @@
 package webserver;
 
+import in2011.http.RequestMessage;
+
 import javax.print.DocFlavor;
 import java.io.InputStream;
 import java.util.Date;
@@ -8,14 +10,18 @@ import java.util.Map;
 /**
  * Created by George on 11/03/14.
  */
-public class GetHandler extends RequestHandler {
+public class GetHandler extends HeadHandler {
 
     private Date lastModified;
 
-    public GetHandler(InputStream is)
+    public GetHandler(RequestMessage requestMessage)
     {
-        super(is);
-        this.lastModified
+        super(requestMessage);
+
+    }
+    @Override
+    public String getResponseBody() {
+        return null;
     }
 
     @Override
@@ -24,9 +30,5 @@ public class GetHandler extends RequestHandler {
         return "GET";
     }
 
-    @Override
-    public Map<String, String> getReponseHeaders()
-    {
 
-    }
 }

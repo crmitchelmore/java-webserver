@@ -1,5 +1,7 @@
 package webserver;
 
+import in2011.http.RequestMessage;
+
 import javax.xml.ws.http.HTTPException;
 
 /**
@@ -12,19 +14,20 @@ public class RequestHandlerFactory {
 
     }
 
-    public static RequestHandler createRequest(String method) throws HTTPException
+    public static RequestHandler createRequest(RequestMessage requestMessage) throws HTTPException
     {
+        String method = requestMessage.getMethod();
         if (method.equals("HEAD"))
         {
-            return new HeadHandler();
+            return new HeadHandler(requestMessage);
         }
         else if(method.equals("GET"))
         {
-            return new GetHandler();
+            return new GetHandler(requestMessage);
         }
         else if(method.equals("PUT"))
         {
-            return new PutHandler();
+            return new PutHandler(requestMessage);
         }
         else
         {
