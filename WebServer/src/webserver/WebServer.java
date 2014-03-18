@@ -103,7 +103,7 @@ public class WebServer {
             }catch (HTTPException httpException){
 
                     rspMsg = new ResponseMessage(httpException.getStatusCode());
-
+                    body = ("<h1>ERROR : "+rspMsg.getStatusCode() + "</h1>").getBytes();
 
             }
 

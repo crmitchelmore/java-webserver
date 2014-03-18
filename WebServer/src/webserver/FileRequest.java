@@ -134,10 +134,14 @@ public class FileRequest {
             builder.append("<body>\n<h1>" + this.getDecodedURI() + "</h1><br>");
 
             stream = Files.newDirectoryStream(this.absolutePath);
+            int rootPathCount = this.absolutePath.getNameCount();
             for (Path file: stream) {
-                builder.append("<a href=\"" + file.toString() + "\">" + file.toString() + "</a><br>");
+                Path resolved = file.subpath(rootPathCount, file.getNameCount());
+                String directory = Files.isDirectory(file) ? "Dir: " : "";
+                if ( !Files.isSymbolicLink(resolved) ){
+                    builder.append(directory + "<a href=\"" + resolved.toString() + "\">" + resolved.toString() + "</a><br>");
+                }
 
-                System.out.println(file.getFileName());
             }
 
             builder.append("</body>\n</html>");

@@ -20,6 +20,7 @@ public abstract class RequestHandler {
 
     public RequestHandler(RequestMessage requestMessage, String rootDir) throws HTTPException
     {
+
         try {
             fileRequest = new FileRequest(rootDir, requestMessage.getURI());
         }
@@ -31,6 +32,7 @@ public abstract class RequestHandler {
         {
             throw new HTTPException(400);
         }
+        headers = new HashMap<String, String>();
     }
 
 

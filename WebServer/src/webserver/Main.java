@@ -19,7 +19,7 @@ public class Main {
 //        } catch (NumberFormatException e) {
 //            throw new Error(usage + "\n" + "<port-number> must be an integer");
 //        }
-        String rootDir = "~/Documents";// args[1];
+        String rootDir = "/Users/cmitchelmore/Documents";// args[1];
 //        boolean logging;
 //        if (args[2].equals("0")) {
 //            logging = false;
