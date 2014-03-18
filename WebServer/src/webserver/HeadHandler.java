@@ -4,10 +4,7 @@ import in2011.http.RequestMessage;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * Created by George on 11/03/14.
@@ -28,16 +25,17 @@ public class HeadHandler extends RequestHandler {
 
     @Override
     public int getResponse() {
+//        return lastModifiedFileDate.compareTo(dateLastModified) > 0;
         return 0;
     }
 
     @Override
-    public String getResponseBody() {
+    public byte[] getResponseBody() {
         return null;
     }
 
     @Override
-    public Map<String, String> getResponseHeaders()
+    public HashMap<String, String> getResponseHeaders()
     {
         // current date
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
@@ -46,10 +44,12 @@ public class HeadHandler extends RequestHandler {
         super.headers.put("Date", httpDate);
 
         // content type
-        super.headers.put("ContentType", "");
+        super.headers.put("Content-Type", "");
 
         // last modified
-        super.headers.put("LastModified", "");
+      String lastModified = simpleDateFormat.format(((ReadFileRequest)fileRequest).lastModified());
+
+        super.headers.put("Last-Modified", lastModified);
 
         return headers;
     }

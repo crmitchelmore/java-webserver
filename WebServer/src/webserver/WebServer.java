@@ -89,10 +89,13 @@ public class WebServer {
             rspMsg.addHeaderField(ent.getKey(), ent.getValue());
         }
 
-        thisOne.getResponseBody();
 
-        // We write the message to the OutputStream
-        msg.write(os);
+
+        //Write the response message
+        rspMsg.write(os);
+
+        os.write(thisOne.getResponseBody());
+
 
         // Close this and the thread ends.
         sock.close();

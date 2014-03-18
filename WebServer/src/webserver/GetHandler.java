@@ -20,7 +20,8 @@ public class GetHandler extends HeadHandler {
 
     }
     @Override
-    public String getResponseBody() {
+    public byte[] getResponseBody() {
+        this.fileRequest.getFile();
         return null;
     }
 

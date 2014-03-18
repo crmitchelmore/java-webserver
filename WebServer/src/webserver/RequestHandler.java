@@ -36,7 +36,7 @@ public abstract class RequestHandler {
 
     public abstract int getResponse();
 
-    public abstract String getResponseBody();
+    public abstract byte[] getResponseBody();
 
     public abstract HashMap<String, String> getResponseHeaders();
 }
