@@ -12,6 +12,7 @@ import java.net.URLDecoder;
 import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by cmitchelmore on 11/03/2014.
@@ -21,6 +22,7 @@ public class FileHandler {
     private Path rootDirectory;
     private Path absolutePath;
     private URI decodedURI;
+    private static ConcurrentHashMap<String, Integer> map;
 
     public void check(){
 
@@ -86,6 +88,12 @@ public class FileHandler {
 
     public void createFileOrFolderWithBytes(byte[] bytes) throws IOException{
         //atomic...
+
+        synchronized ( FileHandler.class ){
+
+
+        }
+
         Path decodedURIPath = Paths.get(this.decodedURI);
         int pathComponents = decodedURIPath.getNameCount();
         if ( pathComponents > 1 ){
