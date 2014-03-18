@@ -2,19 +2,12 @@ package webserver;
 
 import in2011.http.RequestMessage;
 import in2011.http.ResponseMessage;
-import in2011.http.StatusCodes;
-import in2011.http.EmptyMessageException;
 import in2011.http.MessageFormatException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.*;
-import java.nio.*;
-import java.text.MessageFormat;
-import java.util.Date;
 import java.util.Map;
-
-import org.apache.http.client.utils.DateUtils;
 
 import javax.xml.ws.http.HTTPException;
 
@@ -87,19 +80,21 @@ public class WebServer {
             is = sock.getInputStream();
 
             // Thread creates a response message by parsing the input stream
-            RequestMessage msg = RequestMessage.parse(is);
+            RequestMessage requestMessage = RequestMessage.parse(is);
             ResponseMessage rspMsg = null;
             // We create a request handler, based on the request made by the user
-            RequestHandler thisOne = null;
+            RequestHandler requestHandler = null;
+            byte[] body = null;
             try {
-                RequestHandlerFactory.createRequest(msg, rootDir);
+                requestHandler = RequestHandlerFactory.createRequest(requestMessage, rootDir);
 
+                body = requestHandler.responseBody();
                 // We create a response message, by calling the method GetResponse
                 // which handles parsing the given response
-                rspMsg =   new ResponseMessage(thisOne.getResponse());
+                rspMsg =   new ResponseMessage(requestHandler.httpResponseCode());
 
                 // We add the headers to the response message
-                for(Map.Entry<String, String> ent : thisOne.getResponseHeaders().entrySet())
+                for(Map.Entry<String, String> ent : requestHandler.responseHeaders().entrySet())
                 {
                     rspMsg.addHeaderField(ent.getKey(), ent.getValue());
                 }
@@ -116,7 +111,7 @@ public class WebServer {
 
             //Write the response message
             rspMsg.write(os);
-            os.write(thisOne.getResponseBody());
+            os.write(body);
 
             // Close this and the thread ends.
 

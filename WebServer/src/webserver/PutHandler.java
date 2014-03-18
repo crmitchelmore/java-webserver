@@ -17,23 +17,18 @@ public class PutHandler extends RequestHandler {
     }
 
     @Override
-    public String getMethod()
+    public int httpResponseCode()
     {
-        return "PUT";
+        return 201;
     }
 
     @Override
-    public int getResponse() {
-        return 0;
-    }
-
-    @Override
-    public byte[] getResponseBody() throws IOException{
+    public byte[] responseBody() throws IOException{
         return null;
     }
 
     @Override
-    public HashMap<String, String> getResponseHeaders() {
+    public HashMap<String, String> responseHeaders() {
         return null;
     }
 }

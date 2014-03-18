@@ -33,11 +33,11 @@ public abstract class RequestHandler {
         }
     }
 
-    public abstract String getMethod();
 
-    public abstract int getResponse();
 
-    public abstract byte[] getResponseBody() throws IOException;
+    public abstract int httpResponseCode();
 
-    public abstract HashMap<String, String> getResponseHeaders();
+    public abstract byte[] responseBody() throws IOException;
+
+    public abstract HashMap<String, String> responseHeaders();
 }
