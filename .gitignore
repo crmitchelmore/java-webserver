@@ -19,6 +19,7 @@
 .project
 .metadata
 bin/**
+out/
 tmp/**
 tmp/**/*
 *.tmp

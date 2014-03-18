@@ -27,43 +27,18 @@ public class WebServer {
      * Method which runs continuously and fires of new threads as and when required.
      * @throws IOException
      */
-    public void start() {
-        while (true) {
-
-            Socket socky = null;
-
-            try {
-                socky = this.waitForConnection();
-            }
-            catch(IOException ioe)
-            {
-                // nothing needs to happen really, as the loop
-                // will continue and no execution is affected
-                // by this brief connection error.
-            }
-
-            // only execute behaviour if the connection found is not null
-            if (socky != null)
-            {
-                WebThread webThread = new WebThread(socky, rootDir);
-                Thread t = new Thread(webThread);
-                t.start();
-
-
-            }
-        }
-    }
-
-    /**
-     * The method which waits for the connection, and returns TRUE if a connection is found.
-     *
-     * Or perhaps it should return the actual connection, or some useful information, to then pass into "AcceptConnection"
-     * @return -- Not sure just yet.
-     */
-    private Socket waitForConnection() throws IOException {
+    static int c = 0;
+    public void start() throws IOException
+    {
         ServerSocket serverSock = new ServerSocket(port);
-        Socket sock = serverSock.accept();
-        return sock;
+
+        while (true) {
+            Socket socket = serverSock.accept();
+            System.out.println(c++);
+            WebThread webThread = new WebThread(socket, rootDir);
+            Thread t = new Thread(webThread);
+            t.start();
+        }
     }
 
 

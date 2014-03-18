@@ -28,36 +28,6 @@ public class FileRequest {
         return absolutePath;
     }
 
-/*
-    public void check(){
-
-
-        Date lastModified = new Date(98l);
-
-         if ( true ) { // get or head
-            if ( !fileExists() ){
-                throw new HTTPException(404);//Not Found
-            }else if ( lastModified && !isFileModifiedSince(lastModified) ){
-                //304 Not modified
-            }else if ( !canReadFile() ){
-                throw new HTTPException(500);//Can't read file. Maybe should be something else
-            }else{
-                //200
-                //if get
-                byte[] bytes = theFile();
-                //add header
-                String mimeType = mimeType();
-                String fileSize = "" + bytes.length;
-
-            }
-        }else if ( true ){//put
-            byte[] bytes = null;
-            createFileOrFolderWithBytes(bytes);
-        }
-    }
-
-*/
-
 
 
     public FileRequest(String rootDirectory, String uri) throws URISyntaxException, SecurityException //throw new ;//Bad Request
@@ -70,7 +40,7 @@ public class FileRequest {
 
         //File outside the scope of the server directory. Throws SecurityException
         if ( !this.absolutePath.startsWith(rootDirectory) ){
-            throw new SecurityException("Access forbidden");
+            throw new SecurityException();
         }
     }
 
