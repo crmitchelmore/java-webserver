@@ -180,31 +180,24 @@ public class FileRequest {
         return null;
     }
 
+    public long fileSize()
+    {
+        try {
+            return Files.size(this.absolutePath);
+        }catch (IOException e){
+            return 0;
+        }
+    }
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public void createFileOrFolderWithBytes(byte[] bytes) throws IOException {
+    public void createFileOrFolderWithBytes(byte[] bytes, long maxLength) throws IOException, SecurityException {
         //atomic...
 
-
+        if ( fileExists() ){
+            throw new SecurityException();
+        }
 
         Path decodedURIPath = Paths.get(this.decodedURI);
         int pathComponents = decodedURIPath.getNameCount();
@@ -212,12 +205,13 @@ public class FileRequest {
             Path directoryStructure = decodedURIPath.subpath(0, pathComponents-1);
             Files.createDirectories(this.rootDirectory.resolve(directoryStructure));
         }
-        if ( true ){//file
-            if ( bytes != null ){
+
+        if ( isDirectory() ){//file
+            Files.createDirectory(this.absolutePath);
+        }else{//folder
+            if ( bytes != null ){ //Write max of maxLength
                 Files.write(this.absolutePath, bytes);
             }
-        }else{//folder
-            Files.createDirectory(this.absolutePath);
         }
 
     }

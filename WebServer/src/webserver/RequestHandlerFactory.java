@@ -10,6 +10,7 @@ import javax.xml.ws.http.HTTPException;
 public class RequestHandlerFactory {
 
     private static final float MINIMUM_HTTP_VERSION = 1.1f;
+    private static final int MAXIMUM_URI_LENGTH = 2000;
     public RequestHandlerFactory()
     {
 
@@ -20,6 +21,9 @@ public class RequestHandlerFactory {
         //A comment here...
         if ( Float.parseFloat(requestMessage.getVersion()) < MINIMUM_HTTP_VERSION ){
             throw new HTTPException(505);
+        }
+        if ( requestMessage.getURI().length() > MAXIMUM_URI_LENGTH ){
+            throw new HTTPException(414);
         }
 
         String method = requestMessage.getMethod();

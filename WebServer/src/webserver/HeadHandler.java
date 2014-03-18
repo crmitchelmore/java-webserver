@@ -68,6 +68,7 @@ public class HeadHandler extends RequestHandler {
 
         headers.put("Last-Modified", lastModified);
 
+        headers.put("Content-Length", ""+fileRequest.fileSize());
         return headers;
     }
 }
