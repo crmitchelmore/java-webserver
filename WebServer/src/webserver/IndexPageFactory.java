@@ -1,6 +1,8 @@
 package webserver;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -44,6 +46,40 @@ public class IndexPageFactory {
     //Get what ever the index page is
     public File indexPage()
     {
-        for
+        File indexPage = null;
+        for( int i = 0; i < acceptablePages.length; i++ ){
+            indexPage = this.fileRequest.getFileAtPathIfExists(acceptablePages[i]);
+            if ( indexPage != null ){
+                return indexPage;
+            }
+        }
+        return null;
+    }
+
+
+    private String directoryStructure() throws IOException {
+        DirectoryStream<Path> stream = null;
+        String s = null;
+        try {
+            StringBuilder builder = new StringBuilder("<html>\n<head><title>" + this.fileRequest.getDecodedURI() + "</title></head>\n");
+
+            builder.append("<body>\n<h1>" + this.fileRequest.getDecodedURI() + "</h1><br>");
+
+            stream = Files.newDirectoryStream( this.fileRequest.getAbsolutePath());
+            for (Path file: stream) {
+                builder.append("<a href=\"" + file.toString() + "\">" + file.toString() + "</a><br>");
+
+                System.out.println(file.getFileName());
+            }
+
+            builder.append("</body>\n</html>");
+            s = builder.toString();
+        } finally {
+            if ( stream != null ){
+                stream.close();
+            }
+        }
+
+        return s;
     }
 }

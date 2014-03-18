@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by cmitchelmore on 11/03/2014.
+
  */
 public class FileRequest {
 
@@ -20,16 +21,20 @@ public class FileRequest {
     private URI decodedURI;
     private static ConcurrentHashMap<String, Integer> map;
 
+    public URI getDecodedURI() {
+        return decodedURI;
+    }
+
+    public Path getAbsolutePath() {
+        return absolutePath;
+    }
+
+/*
     public void check(){
 
-        Date lastModified = new Date(98l);
-        try {
 
-        }catch (URISyntaxException syntaxException){
-            throw new HTTPException(400);
-        } catch (SecurityException securityException){
-            throw new HTTPException(403);
-        }
+        Date lastModified = new Date(98l);
+
          if ( true ) { // get or head
             if ( !fileExists() ){
                 throw new HTTPException(404);//Not Found
@@ -52,11 +57,12 @@ public class FileRequest {
         }
     }
 
+*/
 
 
 
-
-    public FileRequest(String rootDirectory, String uri) throws URISyntaxException, SecurityException{ //throw new ;//Bad Request
+    public FileRequest(String rootDirectory, String uri) throws URISyntaxException, SecurityException //throw new ;//Bad Request
+    {
         this.rootDirectory = Paths.get(rootDirectory);
         //The URI is not using the correct syntax .Throws URISyntaxException
         this.decodedURI = new URI(uri);
@@ -68,7 +74,16 @@ public class FileRequest {
         }
     }
 
-    public File getFile(){
+    public boolean isFileModifiedSince(Date dateLastModified) throws IOException
+    {
+        FileTime lastModifiedFileTime = Files.getLastModifiedTime(this.absolutePath);
+        Date lastModifiedFileDate = new Date(lastModifiedFileTime.toMillis());
+        return lastModifiedFileDate.compareTo(dateLastModified) > 0; //Returns True if lastModifiedFileDate is after dateLastModified
+    }
+
+
+
+    public File getFile() throws IOException{
         boolean isSymbolic = Files.isSymbolicLink(this.absolutePath);
 
         boolean isReadable = Files.isReadable(this.absolutePath);
@@ -79,7 +94,7 @@ public class FileRequest {
                 if ( isReadable ){ //Only instantaneous check
                     return new File(this.absolutePath.toUri());
                 }else {
-                    throw new IOException;//??
+                    throw new IOException();//??
                 }
 
             }else if ( isDirectory() ){
@@ -91,7 +106,7 @@ public class FileRequest {
         if ( fileExists ){
             return new File(this.absolutePath.toUri());
         }
-        throw new ;
+        return null;
     }
 
     public boolean isDirectory()
@@ -106,7 +121,7 @@ public class FileRequest {
             Path extendedPath = this.absolutePath.resolve(pathExtension);
             boolean exists = Files.exists(extendedPath) && Files.isRegularFile(extendedPath, LinkOption.NOFOLLOW_LINKS);
             if ( exists ){
-                return File()
+                return new File(extendedPath.toUri());
             }
         }
         return null;
@@ -116,10 +131,7 @@ public class FileRequest {
     public void createFileOrFolderWithBytes(byte[] bytes) throws IOException{
         //atomic...
 
-        synchronized ( FileRequest.class ){
 
-
-        }
 
         Path decodedURIPath = Paths.get(this.decodedURI);
         int pathComponents = decodedURIPath.getNameCount();
@@ -137,22 +149,7 @@ public class FileRequest {
 
     }
 
-    public byte[] theFile() throws IOException{
-        if ( isDirectory() ){
-            if ( hasIndex() ){
-                return Files.readAllBytes(this.absolutePath.resolve("index.html"));
-            }else{
-                return directoryStructure().getBytes();
-            }
-        }
-        return Files.readAllBytes(this.absolutePath);
-    }
 
-    public boolean isFileModifiedSince(Date dateLastModified) throws IOException{
-        FileTime lastModifiedFileTime = Files.getLastModifiedTime(this.absolutePath);
-        Date lastModifiedFileDate = new Date(lastModifiedFileTime.toMillis());
-        return lastModifiedFileDate.compareTo(dateLastModified) > 0; //Returns True if lastModifiedFileDate is after dateLastModified
-    }
 
 
     public String mimeType(){
@@ -174,28 +171,5 @@ public class FileRequest {
     }
 
 
-    public String directoryStructure() throws IOException{
-        DirectoryStream<Path> stream = null;
-        String s = null;
-        try {
-            StringBuilder builder = new StringBuilder("<html>\n<head><title>" + this.decodedURI + "</title></head>\n");
 
-            builder.append("<body>\n<h1>" + this.decodedURI + "</h1><br>");
-
-            stream = Files.newDirectoryStream(this.absolutePath);
-            for (Path file: stream) {
-                builder.append("<a href=\"" + file.toString() + "\">" + file.toString() + "</a><br>");
-
-                System.out.println(file.getFileName());
-            }
-
-            builder.append("</body>\n</html>");
-            s = builder.toString();
-        } finally {
-            if ( stream != null ){
-                stream.close();
-            }
-        }
-        return s;
-    }
 }
