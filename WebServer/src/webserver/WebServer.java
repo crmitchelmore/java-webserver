@@ -81,11 +81,16 @@ public class WebServer {
 
             // Thread creates a response message by parsing the input stream
             RequestMessage requestMessage = RequestMessage.parse(is);
+
+
             ResponseMessage rspMsg = null;
             // We create a request handler, based on the request made by the user
             RequestHandler requestHandler = null;
             byte[] body = null;
             try {
+
+
+
                 requestHandler = RequestHandlerFactory.createRequest(requestMessage, rootDir);
 
                 body = requestHandler.responseBody();

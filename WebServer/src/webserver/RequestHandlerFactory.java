@@ -9,6 +9,7 @@ import javax.xml.ws.http.HTTPException;
  */
 public class RequestHandlerFactory {
 
+    private static final float MINIMUM_HTTP_VERSION = 1.1f;
     public RequestHandlerFactory()
     {
 
@@ -16,6 +17,11 @@ public class RequestHandlerFactory {
 
     public static RequestHandler createRequest(RequestMessage requestMessage, String rootDir) throws HTTPException
     {
+        //A comment here...
+        if ( Float.parseFloat(requestMessage.getVersion()) < MINIMUM_HTTP_VERSION ){
+            throw new HTTPException(505);
+        }
+
         String method = requestMessage.getMethod();
         if (method.equals("HEAD"))
         {
