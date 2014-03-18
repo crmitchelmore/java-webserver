@@ -5,6 +5,7 @@ import java.io.IOException;
 /**
  * Created by George on 11/03/14.
  */
+
 public class Main {
 
     public static void main(String[] args) throws IOException {
@@ -28,6 +29,7 @@ public class Main {
         } else {
             throw new Error(usage);
         }
+
         WebServer server = new WebServer(port, rootDir, logging);
         server.start();
     }

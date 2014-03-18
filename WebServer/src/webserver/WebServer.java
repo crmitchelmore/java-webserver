@@ -34,20 +34,26 @@ public class WebServer {
      * Method which runs continuously and fires of new threads as and when required.
      * @throws IOException
      */
-    public void start() throws IOException, MessageFormatException {
+    public void start() {
         while (true) {
 
-            Socket sohkahtoa = this.waitForConnection();
+            Socket socky = null;
 
-            if (sohkahtoa != null)
-            {
-                // perhaps this part here starts a new thread, within the while loop.
-                // thread.run(this.acceptConnection);
-                this.acceptConnection(sohkahtoa);
+            try {
+                socky = this.waitForConnection();
             }
-            else
+            catch(IOException ioe)
             {
-                throw new IOException();
+                // nothing needs to happen really, as the loop
+                // will continue and no execution is affected
+                // by this brief connection error.
+            }
+
+            // only execute behaviour if the connection found is not null
+            if (socky != null)
+            {
+                // thread.run(this.acceptConnection);
+                this.acceptConnection(socky);
             }
         }
     }
@@ -67,38 +73,52 @@ public class WebServer {
     /**
      * Probably a method which is fired as a new thread?
      */
-    private void acceptConnection(Socket sock) throws IOException,  MessageFormatException
+    private void acceptConnection(Socket sock)
     {
-        // Thread has its own Input and Output Streams4
-        OutputStream os = sock.getOutputStream();
-        InputStream is = sock.getInputStream();
+        // Thread has its own Input and Output Streams
+        // initially null, to avoid 'non-initialise' errors.
+        OutputStream os = null;
+        InputStream is = null;
 
-        // Thread creates a response message by parsing the input stream
-        RequestMessage msg = RequestMessage.parse(is);
-
-        // We create a request handler, based on the request made by the user
-        RequestHandler thisOne = RequestHandlerFactory.createRequest(msg, rootDir);
-
-        // We create a response message, by calling the method GetResponse
-        // which handles parsing the given response
-        ResponseMessage rspMsg = new ResponseMessage(thisOne.getResponse());
-
-        // We add the headers to the response message
-        for(Map.Entry<String, String> ent : thisOne.getResponseHeaders().entrySet())
+        try
         {
-            rspMsg.addHeaderField(ent.getKey(), ent.getValue());
+            // attempt to initialise streams
+            os = sock.getOutputStream();
+            is = sock.getInputStream();
+
+            // Thread creates a response message by parsing the input stream
+            RequestMessage msg = RequestMessage.parse(is);
+
+            // We create a request handler, based on the request made by the user
+            RequestHandler thisOne = RequestHandlerFactory.createRequest(msg, rootDir);
+
+            // We create a response message, by calling the method GetResponse
+            // which handles parsing the given response
+            ResponseMessage rspMsg = new ResponseMessage(thisOne.getResponse());
+
+            // We add the headers to the response message
+            for(Map.Entry<String, String> ent : thisOne.getResponseHeaders().entrySet())
+            {
+                rspMsg.addHeaderField(ent.getKey(), ent.getValue());
+            }
+
+            //Write the response message
+            rspMsg.write(os);
+            os.write(thisOne.getResponseBody());
+
+            // Close this and the thread ends.
+            sock.close();
         }
-
-
-
-        //Write the response message
-        rspMsg.write(os);
-
-        os.write(thisOne.getResponseBody());
-
-
-        // Close this and the thread ends.
-        sock.close();
+        catch (IOException ioe)
+        {
+            // this COULD be handled, to prevent further execution
+            // but any issues will only occur on the users individual
+            // thread, so wont affect the robustness of the server
+        }
+        catch (MessageFormatException mfe)
+        {
+            // something
+        }
     }
 
 
