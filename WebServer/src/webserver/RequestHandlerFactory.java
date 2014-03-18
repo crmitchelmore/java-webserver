@@ -14,7 +14,7 @@ public class RequestHandlerFactory {
 
     }
 
-    public static RequestHandler createRequest(RequestMessage requestMessage) throws HTTPException
+    public static RequestHandler createRequest(RequestMessage requestMessage, String rootDir) throws HTTPException
     {
         String method = requestMessage.getMethod();
         if (method.equals("HEAD"))

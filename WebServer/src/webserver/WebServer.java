@@ -32,7 +32,7 @@ public class WebServer {
      * Method which runs continuously and fires of new threads as and when required.
      * @throws IOException
      */
-    public void start() throws IOException {
+    public void start() throws IOException, MessageFormatException {
         while (true) {
 
             Socket sohkahtoa = this.waitForConnection();
@@ -45,7 +45,7 @@ public class WebServer {
             }
             else
             {
-                // handle what happens when the socket fails?
+                throw new IOException();
             }
         }
     }
@@ -56,19 +56,10 @@ public class WebServer {
      * Or perhaps it should return the actual connection, or some useful information, to then pass into "AcceptConnection"
      * @return -- Not sure just yet.
      */
-    private Socket waitForConnection() {
-        try {
-            ServerSocket serverSock = new ServerSocket(port);
-            Socket sock = serverSock.accept();
-            return sock;
-        }
-        catch(IOException e)
-        {
-            // something went wrong with creating the server socket.
-        }
-
-        // only happens when exception is thrown, so perhaps could be handled better.
-        return null;
+    private Socket waitForConnection() throws IOException {
+        ServerSocket serverSock = new ServerSocket(port);
+        Socket sock = serverSock.accept();
+        return sock;
     }
 
     /**
@@ -76,30 +67,27 @@ public class WebServer {
      */
     private void acceptConnection(Socket sock) throws IOException,  MessageFormatException
     {
-        // thread gets its own request handler.
-        RequestHandler requestHandler;
-
         // Thread has its own Input and Output Streams4
         OutputStream os = sock.getOutputStream();
         InputStream is = sock.getInputStream();
 
+        // Thread creates a response message by parsing the input stream
         RequestMessage msg = RequestMessage.parse(is);
-        RequestHandler thisOne = RequestHandlerFactory.createRequest(msg);
 
+        // We create a request handler, based on the request made by the user
+        RequestHandler thisOne = RequestHandlerFactory.createRequest(msg, rootDir);
+
+        // We create a response message, by calling the method GetResponse
+        // which handles parsing the given response
         ResponseMessage rspMsg = new ResponseMessage(thisOne.getResponse());
 
+        // We add the headers to the response message
+        thisOne.getResponseHeaders();
 
+        thisOne.getResponseBody();
 
-        // HANDLE ANY ERRORS AND RETURNS ETC....
-        try {
-            m = RequestMessage.parse(is);
-        } catch (MessageFormatException ee) {
-            throw new HTTPException(403);
-        }
-
-        this.addHeadersToResponse(msg);
+        // We write the message to the OutputStream
         msg.write(os);
-        os.write(e.getLocalizedMessage().getBytes());
 
         // Close this and the thread ends.
         sock.close();
@@ -111,7 +99,7 @@ public class WebServer {
      */
     public void doStuffwithfile() throws HTTPException{
         try {
-            FileHandle c = FileHandler(path); //throws 403 and 400
+            FileRequest c = FileRequest(path); //throws 403 and 400
             c.save; //404
         } catch ( IOException asd ){
             throw new HTTPException(404);
@@ -119,10 +107,18 @@ public class WebServer {
     }
 
     /**
-     * Method which handles adding headers to the returned response.
-     * @param r
+     * Method which handles adding the body to the ResponseMessage.
      */
-    public void addHeadersToResponse(ResponseMessage r){
-        r.addHeaderField("Date","123123123");
+    private void addBodyToResponse(RequestMessage message)
+    {
+        // how da fuq?
+    }
+
+    /**
+     * Method which handles adding headers to the returned response.
+     * @param message
+     */
+    public void addHeadersToResponse(RequestMessage message){
+        message.addHeaderField("Date", "123123123");
     }
 }

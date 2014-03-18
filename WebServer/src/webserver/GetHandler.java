@@ -14,9 +14,9 @@ public class GetHandler extends HeadHandler {
 
     private Date lastModified;
 
-    public GetHandler(RequestMessage requestMessage)
+    public GetHandler(RequestMessage requestMessage, String rootDir)
     {
-        super(requestMessage);
+        super(requestMessage, rootDir);
 
     }
     @Override
