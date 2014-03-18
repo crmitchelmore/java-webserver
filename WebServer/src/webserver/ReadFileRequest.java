@@ -24,17 +24,16 @@ public class ReadFileRequest extends FileRequest{
     public byte[] getFileBytes() throws IOException
     {
         boolean isSymbolic = Files.isSymbolicLink(this.absolutePath);
-        boolean fileExists = Files.exists(this.absolutePath) && Files.isRegularFile(this.absolutePath, LinkOption.NOFOLLOW_LINKS);
 
         if ( isSymbolic ){
             return null;
         }
 
-        if ( fileExists ){ //403?
+        if ( fileExists() ){ //403?
             return Files.readAllBytes(this.absolutePath);
         }
         if ( isDirectory() ){
-             File indexHTML = this.getFileAtPathIfExists("index.html");
+             File indexHTML = this.indexHTML();
              if ( indexHTML != null ){
                return Files.readAllBytes(indexHTML.toPath());
              }
@@ -51,10 +50,24 @@ public class ReadFileRequest extends FileRequest{
 
     public Date lastModified()
     {
+        File f = indexHTML();
+        if ( f != null ){
+            return new Date(f.lastModified());
+        }else if ( fileExists() || isDirectory() ){
+            return new Date(new File(this.absolutePath.toUri()).lastModified());
+        }
         return null;
     }
 
+    private File indexHTML()
+    {
+        return this.getFileAtPathIfExists("index.html");
+    }
 
+    private boolean fileExists()
+    {
+        return Files.exists(this.absolutePath) && Files.isRegularFile(this.absolutePath, LinkOption.NOFOLLOW_LINKS);
+    }
 
 
 
@@ -87,16 +100,12 @@ public class ReadFileRequest extends FileRequest{
 
     public String mimeType(){
         String type = "text/html";
+        File f = indexHTML();
+        if ( f != null || isDirectory() ){
+            return type;
+        }
         try {
-
-            if ( !isDirectory() ){
-                type = Files.probeContentType(this.absolutePath);
-            }
-
-            if (type == null) {
-                type = "unknown";
-            }
-
+             return Files.probeContentType(this.absolutePath);
         } catch (IOException x) {
             System.err.println(x);
         }
