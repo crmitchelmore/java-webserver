@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
@@ -32,8 +33,7 @@ public class FileRequest {
         this.rootDirectory = Paths.get(rootDirectory);
         uri = uri.substring(1); //Chop the leading
         this.decodedURI = URLDecoder.decode(uri, "UTF-8"); //Remove hex Maybe use ISO-8859-1
-        //The URI is not using the correct syntax .Throws URISyntaxException
-//        this.decodedURI = new URI(uri);
+
         this.absolutePath = this.rootDirectory.resolve(this.decodedURI).normalize();
 
         //File outside the scope of the server directory. Throws SecurityException
@@ -153,10 +153,13 @@ public class FileRequest {
             return type;
         }
         try {
-            return Files.probeContentType(this.absolutePath);
+            type = Files.probeContentType(this.absolutePath);
         } catch (IOException x) {
             type = "Unknown";
             x.printStackTrace();
+        }
+        if ( type == null ){
+            type = URLConnection.guessContentTypeFromName(this.decodedURI);
         }
         return type;
     }
