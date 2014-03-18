@@ -12,6 +12,8 @@ import java.net.*;
 import java.nio.*;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.Map;
+
 import org.apache.http.client.utils.DateUtils;
 
 import javax.xml.ws.http.HTTPException;
@@ -82,7 +84,10 @@ public class WebServer {
         ResponseMessage rspMsg = new ResponseMessage(thisOne.getResponse());
 
         // We add the headers to the response message
-        thisOne.getResponseHeaders();
+        for(Map.Entry<String, String> ent : thisOne.getResponseHeaders().entrySet())
+        {
+            rspMsg.addHeaderField(ent.getKey(), ent.getValue());
+        }
 
         thisOne.getResponseBody();
 
@@ -93,32 +98,5 @@ public class WebServer {
         sock.close();
     }
 
-    /**
-     * Method which handles File stuff, for any requests involving files.
-     * @throws HTTPException
-     */
-    public void doStuffwithfile() throws HTTPException{
-        try {
-            FileRequest c = FileRequest(path); //throws 403 and 400
-            c.save; //404
-        } catch ( IOException asd ){
-            throw new HTTPException(404);
-        }
-    }
 
-    /**
-     * Method which handles adding the body to the ResponseMessage.
-     */
-    private void addBodyToResponse(RequestMessage message)
-    {
-        // how da fuq?
-    }
-
-    /**
-     * Method which handles adding headers to the returned response.
-     * @param message
-     */
-    public void addHeadersToResponse(RequestMessage message){
-        message.addHeaderField("Date", "123123123");
-    }
 }

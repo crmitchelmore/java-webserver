@@ -37,13 +37,13 @@ public class HeadHandler extends RequestHandler {
     }
 
     @Override
-    public Map<String, String> getReponseHeaders()
+    public Map<String, String> getResponseHeaders()
     {
         // current date
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        String httpDate = simpleDateFormat.format(new Date(System.currentTimeMillis()));      
-        super.headers.put("Date", System.currentTimeMillis().);
+        String httpDate = simpleDateFormat.format(new Date(System.currentTimeMillis()));
+        super.headers.put("Date", httpDate);
 
         // content type
         super.headers.put("ContentType", "");
@@ -51,7 +51,6 @@ public class HeadHandler extends RequestHandler {
         // last modified
         super.headers.put("LastModified", "");
 
-
-
+        return headers;
     }
 }

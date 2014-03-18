@@ -15,7 +15,7 @@ public abstract class RequestHandler {
 
     protected FileRequest fileRequest;
 
-    protected Map<String, String> headers;
+    protected HashMap<String, String> headers;
 
     public RequestHandler(RequestMessage requestMessage, String rootDir) throws HTTPException
     {
@@ -38,5 +38,5 @@ public abstract class RequestHandler {
 
     public abstract String getResponseBody();
 
-    public abstract Map<String, String> getResponseHeaders();
+    public abstract HashMap<String, String> getResponseHeaders();
 }
