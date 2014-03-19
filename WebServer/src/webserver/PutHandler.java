@@ -13,9 +13,10 @@ import java.util.Map;
 public class PutHandler extends RequestHandler {
 
     private static final long MAX_FILE_SIZE = 1024 * 1024;
-    public PutHandler(RequestMessage requestMessage, String rootDir)
+
+    public PutHandler(RequestMessage requestMessage, String rootDirectory)
     {
-        super(requestMessage, rootDir);
+        super(requestMessage, rootDirectory);
 
         String contentLengthString = requestMessage.getHeaderFieldValue("Content-Length");
         if ( contentLengthString == null ){
@@ -25,9 +26,9 @@ public class PutHandler extends RequestHandler {
         if ( contentLength > MAX_FILE_SIZE ){
             throw new HTTPException(413);//Entity too large
         }
-        byte[] bytes = null;
+        byte[] bytes = null; //TODO
         try {
-            fileRequest.createFileOrFolderWithBytes(null, MAX_FILE_SIZE);
+            fileRequest.createFileOrFolderWithBytes(bytes, MAX_FILE_SIZE);
         }catch (SecurityException s){
             throw new HTTPException(409);//Conflict
         }catch ( IOException s){
@@ -38,11 +39,11 @@ public class PutHandler extends RequestHandler {
     @Override
     public int httpResponseCode()
     {
-        return 201;
+        return 201; //Created
     }
 
     @Override
-    public byte[] responseBody() throws IOException{
+    public byte[] responseBody() throws HTTPException{
         return null;
     }
 

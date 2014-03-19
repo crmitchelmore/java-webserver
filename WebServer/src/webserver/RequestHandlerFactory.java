@@ -27,21 +27,16 @@ public class RequestHandlerFactory {
         }
 
         String method = requestMessage.getMethod();
-        if (method.equals("HEAD"))
-        {
+        if ( method.equals("HEAD") ){
             return new HeadHandler(requestMessage, rootDir);
-        }
-        else if(method.equals("GET"))
-        {
+        } else if( method.equals("GET") ) {
             return new GetHandler(requestMessage, rootDir);
-        }
-        else if(method.equals("PUT"))
-        {
+        }else if( method.equals("PUT") ){
             return new PutHandler(requestMessage, rootDir);
-        }
-        else
-        {
-            throw new HTTPException(501);
+        }else if( method.equals("POST") ){
+            return null; //TODO
+        }else{
+            throw new HTTPException(501);//Not implemented
         }
     }
 }

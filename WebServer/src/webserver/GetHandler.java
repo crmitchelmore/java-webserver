@@ -14,7 +14,6 @@ import java.util.Map;
  */
 public class GetHandler extends HeadHandler {
 
-    private Date lastModified;
 
     public GetHandler(RequestMessage requestMessage, String rootDir)
     {
@@ -24,16 +23,17 @@ public class GetHandler extends HeadHandler {
     @Override
     public byte[] responseBody() throws HTTPException
     {
-        byte[] bytes = null;
         try {
-            bytes = this.fileRequest.getFileBytes();
+            byte[] bytes = this.fileRequest.getFileBytes();
             if ( bytes == null ){
-                throw new HTTPException(404);
+                throw new HTTPException(404); //Not found
             }
+            return bytes;
+
         }catch (IOException ioe){
-            throw new HTTPException(500);
+            throw new HTTPException(500); //Internal server error
         }
-        return bytes;
+
     }
 
 

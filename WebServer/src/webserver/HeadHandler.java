@@ -14,30 +14,31 @@ import java.util.*;
  */
 public class HeadHandler extends RequestHandler {
 
+
+    private SimpleDateFormat simpleDateFormat;
+
     public HeadHandler(RequestMessage requestMessage, String rootDir)
     {
         super(requestMessage, rootDir);
 
-        Date ifModifiedSince = null;
+        this.simpleDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+        this.simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+
         String ifModifiedSinceString = requestMessage.getHeaderFieldValue("If-Modified-Since");
         if ( ifModifiedSinceString != null ){
+
             try {
-                ifModifiedSince = dateFormat().parse(ifModifiedSinceString);
+                Date ifModifiedSince = this.simpleDateFormat.parse(ifModifiedSinceString);
+                if ( ifModifiedSince.compareTo(fileRequest.lastModified()) >= 0 ){
+                    throw new HTTPException(304); //Not modified
+                }
             }catch (ParseException pe ){
-                throw new HTTPException(400);
+                throw new HTTPException(400); //Bad Request. There might be a case to just ignore this error as we could continue.
             }
-            if ( ifModifiedSince.compareTo(fileRequest.lastModified()) >= 0 ){
-                throw new HTTPException(304);
-            }
+
+
         }
 
-    }
-
-    private SimpleDateFormat dateFormat()
-    {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return simpleDateFormat;
     }
 
 
@@ -56,19 +57,18 @@ public class HeadHandler extends RequestHandler {
     public HashMap<String, String> responseHeaders()
     {
         // current date
-
-        String httpDate = dateFormat().format(new Date(System.currentTimeMillis()));
+        String httpDate = this.simpleDateFormat.format(new Date(System.currentTimeMillis()));
         headers.put("Date", httpDate);
 
         // content type
         headers.put("Content-Type", fileRequest.mimeType());
 
         // last modified
-        String lastModified = dateFormat().format(fileRequest.lastModified());
-
+        String lastModified = this.simpleDateFormat.format(fileRequest.lastModified());
         headers.put("Last-Modified", lastModified);
 
-        headers.put("Content-Length", ""+fileRequest.fileSize());
+
+        headers.put("Content-Length", "" + fileRequest.fileSize());
         return headers;
     }
 }
