@@ -10,11 +10,11 @@ import java.util.Map;
 /**
  * Created by George on 11/03/14.
  */
-public class PutHandler extends RequestHandler {
+public class PUTHandler extends RequestHandler {
 
     private static final long MAX_FILE_SIZE = 1024 * 1024;
 
-    public PutHandler(RequestMessage requestMessage, String rootDirectory)
+    public PUTHandler(RequestMessage requestMessage, String rootDirectory)
     {
         super(requestMessage, rootDirectory);
 
@@ -26,6 +26,7 @@ public class PutHandler extends RequestHandler {
         if ( contentLength > MAX_FILE_SIZE ){
             throw new HTTPException(413);//Entity too large
         }
+
         byte[] bytes = null; //TODO
         try {
             fileRequest.createFileOrFolderWithBytes(bytes, MAX_FILE_SIZE);

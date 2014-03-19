@@ -2,20 +2,16 @@ package webserver;
 
 import in2011.http.RequestMessage;
 
-import javax.print.DocFlavor;
 import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
-import java.util.Map;
 
 /**
  * Created by George on 11/03/14.
  */
-public class GetHandler extends HeadHandler {
+public class GETHandler extends HEADHandler {
 
 
-    public GetHandler(RequestMessage requestMessage, String rootDir)
+    public GETHandler(RequestMessage requestMessage, String rootDir)
     {
         super(requestMessage, rootDir);
 

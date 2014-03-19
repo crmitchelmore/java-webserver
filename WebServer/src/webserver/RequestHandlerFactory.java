@@ -28,13 +28,13 @@ public class RequestHandlerFactory {
 
         String method = requestMessage.getMethod();
         if ( method.equals("HEAD") ){
-            return new HeadHandler(requestMessage, rootDir);
+            return new HEADHandler(requestMessage, rootDir);
         } else if( method.equals("GET") ) {
-            return new GetHandler(requestMessage, rootDir);
+            return new GETHandler(requestMessage, rootDir);
         }else if( method.equals("PUT") ){
-            return new PutHandler(requestMessage, rootDir);
+            return new PUTHandler(requestMessage, rootDir);
         }else if( method.equals("POST") ){
-            return null; //TODO
+            return new POSTHandler(requestMessage, rootDir);
         }else{
             throw new HTTPException(501);//Not implemented
         }

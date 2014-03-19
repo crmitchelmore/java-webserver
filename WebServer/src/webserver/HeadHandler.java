@@ -12,12 +12,12 @@ import java.util.*;
 /**
  * Created by George on 11/03/14.
  */
-public class HeadHandler extends RequestHandler {
+public class HEADHandler extends RequestHandler {
 
 
     private SimpleDateFormat simpleDateFormat;
 
-    public HeadHandler(RequestMessage requestMessage, String rootDir)
+    public HEADHandler(RequestMessage requestMessage, String rootDir)
     {
         super(requestMessage, rootDir);
 
