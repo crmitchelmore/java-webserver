@@ -42,7 +42,6 @@ public class FileRequest {
         }
     }
 
-    //Returns a file if the absolute path points to an actual file (not a folder) and is not a sym link. Else returns null
     public byte[] getFileBytes() throws IOException
     {
         boolean isSymbolic = Files.isSymbolicLink(this.absolutePath);
@@ -149,7 +148,7 @@ public class FileRequest {
     public String mimeType(){
         String type = "text/html";
         File f = indexHTML();
-        if ( f != null || isDirectory() ){
+        if ( f != null || isDirectory() ){ //Index.html  or the html we generate.
             return type;
         }
         try {
@@ -183,7 +182,8 @@ public class FileRequest {
     public long fileSize()
     {
         try {
-            return Files.size(this.absolutePath);
+            byte[] bytes = getFileBytes();
+            return bytes.length; //Should find a better way to do this
         }catch (IOException e){
             return 0;
         }
