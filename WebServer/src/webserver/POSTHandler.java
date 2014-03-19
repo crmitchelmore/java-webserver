@@ -15,12 +15,18 @@ public class POSTHandler extends  RequestHandler{
     {
         super(requestMessage, rootDirectory);
 
-       
+
     }
 
     @Override
     public int httpResponseCode() {
         return 200; //??
+    }
+
+    public HashMap<String, String> postParams()
+    {
+
+        return null;
     }
 
     @Override

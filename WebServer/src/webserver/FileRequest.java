@@ -12,6 +12,7 @@ import java.net.URLDecoder;
 import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,15 +25,28 @@ public class FileRequest {
     protected Path rootDirectory;
     protected Path absolutePath;
     protected String decodedURI;
+    protected HashMap<String, String> parameters;
 
-
-
-
+    public HashMap<String, String> getParameters() {
+        return parameters;
+    }
 
     public FileRequest(String rootDirectory, String uri) throws SecurityException, UnsupportedEncodingException //throw new ;//Bad Request
     {
         this.rootDirectory = Paths.get(rootDirectory);
+        this.parameters = new HashMap<>();
         uri = uri.substring(1); //Chop the leading
+        //Extract params
+        int paramMarkerIndex = uri.indexOf("?");
+        if ( paramMarkerIndex > 0 ){
+
+            int fragmentMarkerIndex = uri.indexOf("#");
+            int end = fragmentMarkerIndex > 0 ? fragmentMarkerIndex : uri.length();
+            String paramString = uri.substring(paramMarkerIndex + 1, end);
+            extractAndSaveParametersFromString(paramString);
+            uri = uri.substring(0, paramMarkerIndex);
+        }
+
         this.decodedURI = URLDecoder.decode(uri, "UTF-8"); //Remove hex Maybe use ISO-8859-1
 
         this.absolutePath = this.rootDirectory.resolve(this.decodedURI).normalize();
@@ -40,6 +54,17 @@ public class FileRequest {
         //File outside the scope of the server directory. Throws SecurityException
         if ( !this.absolutePath.startsWith(rootDirectory) ){
             throw new SecurityException();
+        }
+    }
+
+    private void extractAndSaveParametersFromString(String paramString) throws UnsupportedEncodingException
+    {
+        String[] params = paramString.split("&");
+        for ( String param : params ){
+            String[] keyValue = param.split("=");
+            String key = URLDecoder.decode(keyValue[0], "UTF-8");
+            String value = URLDecoder.decode(keyValue[1], "UTF-8");
+            this.parameters.put(key,value);
         }
     }
 

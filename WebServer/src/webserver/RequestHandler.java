@@ -29,8 +29,9 @@ public abstract class RequestHandler
         }
         headers = new HashMap<String, String>();
     }
-
-
+    public HashMap<String, String> getParameters() {
+        return fileRequest.getParameters();
+    }
 
     public abstract int httpResponseCode();
 
