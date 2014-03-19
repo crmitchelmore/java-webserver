@@ -39,7 +39,7 @@ public class WebThread implements Runnable {
 
         System.out.println("Thread id: #" + Thread.currentThread().getId());
         try {
-            // attempt to initialise streams
+            // Attempt to initialise streams. We could do them separately and write 500 if input fails but output succeeds.
             outputStream = sock.getOutputStream();
             inputStream = sock.getInputStream();
 

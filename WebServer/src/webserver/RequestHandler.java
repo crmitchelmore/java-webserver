@@ -11,27 +11,21 @@ import java.util.*;
 /**
  * Created by George on 11/03/14.
  */
-public abstract class RequestHandler {
-
-    private String uri;
+public abstract class RequestHandler
+{
 
     protected FileRequest fileRequest;
 
     protected HashMap<String, String> headers;
 
-    public RequestHandler(RequestMessage requestMessage, String rootDir) throws HTTPException
+    public RequestHandler(RequestMessage requestMessage, String rootDirectory) throws HTTPException
     {
-
         try {
-            fileRequest = new FileRequest(rootDir, requestMessage.getURI());
-        }
-        catch( UnsupportedEncodingException e)
-        {
-            throw new HTTPException(403);
-        }
-        catch (SecurityException se)
-        {
-            throw new HTTPException(400);
+            fileRequest = new FileRequest(rootDirectory, requestMessage.getURI());
+        } catch( UnsupportedEncodingException e){
+            throw new HTTPException(400); //Bad request e.g. the URI is not valid
+        } catch (SecurityException se) {
+            throw new HTTPException(403); //Forbidden. URI is not contained by rootDirectory
         }
         headers = new HashMap<String, String>();
     }
@@ -40,7 +34,7 @@ public abstract class RequestHandler {
 
     public abstract int httpResponseCode();
 
-    public abstract byte[] responseBody() throws IOException;
+    public abstract byte[] responseBody() throws HTTPException;
 
     public abstract HashMap<String, String> responseHeaders();
 }

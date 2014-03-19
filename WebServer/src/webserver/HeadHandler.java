@@ -48,7 +48,7 @@ public class HeadHandler extends RequestHandler {
     }
 
     @Override
-    public byte[] responseBody() throws IOException{
+    public byte[] responseBody() throws HTTPException{
         return null;
     }
 
