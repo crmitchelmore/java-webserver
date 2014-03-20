@@ -11,9 +11,9 @@ import java.util.HashMap;
  */
 public class POSTHandler extends  RequestHandler{
 
-    public POSTHandler(RequestMessage requestMessage, String rootDirectory)
+    public POSTHandler(RequestMessageBody requestMessageBody, String rootDirectory)
     {
-        super(requestMessage, rootDirectory);
+        super(requestMessageBody, rootDirectory);
 
 
     }

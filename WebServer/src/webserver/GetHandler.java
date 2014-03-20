@@ -11,9 +11,9 @@ import java.io.IOException;
 public class GETHandler extends HEADHandler {
 
 
-    public GETHandler(RequestMessage requestMessage, String rootDir)
+    public GETHandler(RequestMessageBody requestMessageBody, String rootDir)
     {
-        super(requestMessage, rootDir);
+        super(requestMessageBody, rootDir);
 
     }
     @Override

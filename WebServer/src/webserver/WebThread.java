@@ -44,7 +44,7 @@ public class WebThread implements Runnable {
             inputStream = sock.getInputStream();
 
             // Thread creates a response message by parsing the input stream
-            RequestMessage requestMessage = null;
+            RequestMessageBody requestMessageBody = null;
             ResponseMessage responseMessage = null;
             RequestHandler requestHandler = null;
             byte[] responseBodyBytes = null;
@@ -53,13 +53,15 @@ public class WebThread implements Runnable {
 
                 try {
                     // We create a request handler, based on the request made by the user
-                    requestMessage = RequestMessage.parse(inputStream);
+                    requestMessageBody = RequestMessageBody.parse(inputStream);
                 } catch (MessageFormatException mfe) {
                     throw new HTTPException(400); //Bad Request
+                } catch (IOException ioe){
+                    throw new HTTPException(500);//Internal server error
                 }
 
 
-                requestHandler = RequestHandlerFactory.createRequest(requestMessage, rootDir);
+                requestHandler = RequestHandlerFactory.createRequest(requestMessageBody, rootDir);
 
                 responseBodyBytes = requestHandler.responseBody();
                 // We create a response message, by calling the method GetResponse

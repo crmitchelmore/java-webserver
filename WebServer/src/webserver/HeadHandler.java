@@ -17,14 +17,14 @@ public class HEADHandler extends RequestHandler {
 
     private SimpleDateFormat simpleDateFormat;
 
-    public HEADHandler(RequestMessage requestMessage, String rootDir)
+    public HEADHandler(RequestMessageBody requestMessageBody, String rootDir)
     {
-        super(requestMessage, rootDir);
+        super(requestMessageBody, rootDir);
 
         this.simpleDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
         this.simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 
-        String ifModifiedSinceString = requestMessage.getHeaderFieldValue("If-Modified-Since");
+        String ifModifiedSinceString = requestMessageBody.getHeaderFieldValue("If-Modified-Since");
         if ( ifModifiedSinceString != null ){
 
             try {

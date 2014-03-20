@@ -14,20 +14,21 @@ public class PUTHandler extends RequestHandler {
 
     private static final long MAX_FILE_SIZE = 1024 * 1024;
 
-    public PUTHandler(RequestMessage requestMessage, String rootDirectory)
+    public PUTHandler(RequestMessageBody requestMessageBody, String rootDirectory)
     {
-        super(requestMessage, rootDirectory);
+        super(requestMessageBody, rootDirectory);
 
-        String contentLengthString = requestMessage.getHeaderFieldValue("Content-Length");
+        String contentLengthString = requestMessageBody.getHeaderFieldValue("Content-Length");
         if ( contentLengthString == null ){
             throw new HTTPException(411);//Client must specify content length
         }
-        long contentLength = Long.getLong(contentLengthString);
+        long contentLength = Long.parseLong(contentLengthString);
+
         if ( contentLength > MAX_FILE_SIZE ){
             throw new HTTPException(413);//Entity too large
         }
 
-        byte[] bytes = null; //TODO
+        byte[] bytes = requestMessageBody.getMessageBody();
         try {
             fileRequest.createFileOrFolderWithBytes(bytes, MAX_FILE_SIZE);
         }catch (SecurityException s){

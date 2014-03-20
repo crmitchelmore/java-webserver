@@ -18,10 +18,10 @@ public abstract class RequestHandler
 
     protected HashMap<String, String> headers;
 
-    public RequestHandler(RequestMessage requestMessage, String rootDirectory) throws HTTPException
+    public RequestHandler(RequestMessageBody requestMessageBody, String rootDirectory) throws HTTPException
     {
         try {
-            fileRequest = new FileRequest(rootDirectory, requestMessage.getURI());
+            fileRequest = new FileRequest(rootDirectory, requestMessageBody.getURI());
         } catch( UnsupportedEncodingException e){
             throw new HTTPException(400); //Bad request e.g. the URI is not valid
         } catch (SecurityException se) {

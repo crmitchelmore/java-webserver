@@ -9,32 +9,32 @@ import javax.xml.ws.http.HTTPException;
  */
 public class RequestHandlerFactory {
 
-    private static final float MINIMUM_HTTP_VERSION = 1.1f;
+    private static final float MINIMUM_HTTP_VERSION = Float.parseFloat(RequestMessage.DEFAULT_HTTP_VERSION);
     private static final int MAXIMUM_URI_LENGTH = 2000;
     public RequestHandlerFactory()
     {
 
     }
 
-    public static RequestHandler createRequest(RequestMessage requestMessage, String rootDir) throws HTTPException
+    public static RequestHandler createRequest(RequestMessageBody requestMessageBody, String rootDir) throws HTTPException
     {
         //A comment here...
-        if ( Float.parseFloat(requestMessage.getVersion()) < MINIMUM_HTTP_VERSION ){
+        if ( Float.parseFloat(requestMessageBody.getVersion()) < MINIMUM_HTTP_VERSION ){
             throw new HTTPException(505);
         }
-        if ( requestMessage.getURI().length() > MAXIMUM_URI_LENGTH ){
+        if ( requestMessageBody.getURI().length() > MAXIMUM_URI_LENGTH ){
             throw new HTTPException(414);
         }
 
-        String method = requestMessage.getMethod();
+        String method = requestMessageBody.getMethod();
         if ( method.equals("HEAD") ){
-            return new HEADHandler(requestMessage, rootDir);
+            return new HEADHandler(requestMessageBody, rootDir);
         } else if( method.equals("GET") ) {
-            return new GETHandler(requestMessage, rootDir);
+            return new GETHandler(requestMessageBody, rootDir);
         }else if( method.equals("PUT") ){
-            return new PUTHandler(requestMessage, rootDir);
+            return new PUTHandler(requestMessageBody, rootDir);
         }else if( method.equals("POST") ){
-            return new POSTHandler(requestMessage, rootDir);
+            return new POSTHandler(requestMessageBody, rootDir);
         }else{
             throw new HTTPException(501);//Not implemented
         }
