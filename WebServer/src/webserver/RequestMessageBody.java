@@ -37,21 +37,24 @@ public class RequestMessageBody extends Message {
 
         RequestMessageBody requestMessageBody = new RequestMessageBody(requestMessage.getMethod(), requestMessage.getURI(), requestMessage.getVersion());
         requestMessageBody.requestMessage = requestMessage;
+        requestMessageBody.messageBody = new byte[0]; //By default all messages should return a body even if it's 0 length (except 1**, 204 and 304)
 
+        String contentLengthString = requestMessageBody.getHeaderFieldValue("Content-Length");
+        if ( contentLengthString != null ){
+            long contentLength = Long.parseLong(contentLengthString);
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-//        if ( inputStream.available() > 0 ){
             int b = inputStream.read();
-            while ( b != -1 ) {
-
-                byteArrayOutputStream.write(b);
+            byteArrayOutputStream.write(b);
+            while ( b != -1 && --contentLength > 0 ) {
                 b = inputStream.read();
-                System.out.println(b);
+                byteArrayOutputStream.write(b);
             }
-
             requestMessageBody.messageBody = byteArrayOutputStream.toByteArray();
-//        }
+
+        }
+
         return requestMessageBody;
     }
 
