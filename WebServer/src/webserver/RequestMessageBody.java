@@ -5,6 +5,7 @@ import in2011.http.Message;
 import in2011.http.RequestMessage;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -26,10 +27,7 @@ public class RequestMessageBody extends Message {
         this.requestMessage = new RequestMessage(method, uri, version);
     }
 
-    public RequestMessageBody(String method, String uri)
-    {
-         this.requestMessage = new RequestMessage(method, uri, DEFAULT_HTTP_VERSION);
-    }
+
 
 
     public static RequestMessageBody parse(InputStream inputStream)
@@ -40,15 +38,20 @@ public class RequestMessageBody extends Message {
         RequestMessageBody requestMessageBody = new RequestMessageBody(requestMessage.getMethod(), requestMessage.getURI(), requestMessage.getVersion());
         requestMessageBody.requestMessage = requestMessage;
 
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-        int b = inputStream.read();
-        while ( b != -1 ) {
-            byteArrayOutputStream.write(b);
-            b = inputStream.read();
-        }
+//        if ( inputStream.available() > 0 ){
+            int b = inputStream.read();
+            while ( b != -1 ) {
 
-        requestMessageBody.messageBody = byteArrayOutputStream.toByteArray();
+                byteArrayOutputStream.write(b);
+                b = inputStream.read();
+                System.out.println(b);
+            }
+
+            requestMessageBody.messageBody = byteArrayOutputStream.toByteArray();
+//        }
         return requestMessageBody;
     }
 

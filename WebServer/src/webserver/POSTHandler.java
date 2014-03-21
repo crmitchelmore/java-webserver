@@ -36,6 +36,7 @@ public class POSTHandler extends  RequestHandler{
 
     @Override
     public HashMap<String, String> responseHeaders() {
-        return null;
+        super.responseHeaders();
+        return headers;
     }
 }

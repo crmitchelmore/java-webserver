@@ -4,6 +4,7 @@ import in2011.http.RequestMessage;
 
 import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,12 +30,14 @@ public class PUTHandler extends RequestHandler {
         }
 
         byte[] bytes = requestMessageBody.getMessageBody();
-        try {
-            fileRequest.createFileOrFolderWithBytes(bytes, MAX_FILE_SIZE);
-        }catch (SecurityException s){
-            throw new HTTPException(409);//Conflict
-        }catch ( IOException s){
-            throw new HTTPException(500);//Internal server error
+        if ( bytes != null && bytes.length > 0 ){
+            try {
+                fileRequest.createFileOrFolderWithBytes(bytes, MAX_FILE_SIZE);
+            }catch (SecurityException s){
+                throw new HTTPException(409);//Conflict
+            }catch ( IOException s){
+                throw new HTTPException(500);//Internal server error
+            }
         }
     }
 
@@ -46,11 +49,13 @@ public class PUTHandler extends RequestHandler {
 
     @Override
     public byte[] responseBody() throws HTTPException{
-        return null;
+        return new byte[0];
     }
 
     @Override
     public HashMap<String, String> responseHeaders() {
-        return null;
+        super.responseHeaders();
+
+        return headers;
     }
 }

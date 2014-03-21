@@ -29,7 +29,7 @@ public class RequestHandlerFactory {
         String method = requestMessageBody.getMethod();
         if ( method.equals("HEAD") ){
             return new HEADHandler(requestMessageBody, rootDir);
-        } else if( method.equals("GET") ) {
+        }else if( method.equals("GET") ) {
             return new GETHandler(requestMessageBody, rootDir);
         }else if( method.equals("PUT") ){
             return new PUTHandler(requestMessageBody, rootDir);

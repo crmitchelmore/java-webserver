@@ -91,7 +91,9 @@ public class WebThread implements Runnable {
 
             // Close this and the thread ends.
 
+
         } catch (IOException ioe) {
+            ioe.printStackTrace();
             // this COULD be handled, to prevent further execution
             // but any issues will only occur on the users individual
             // thread, so wont affect the robustness of the server

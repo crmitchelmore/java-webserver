@@ -15,14 +15,13 @@ import java.util.*;
 public class HEADHandler extends RequestHandler {
 
 
-    private SimpleDateFormat simpleDateFormat;
+
 
     public HEADHandler(RequestMessageBody requestMessageBody, String rootDir)
     {
         super(requestMessageBody, rootDir);
 
-        this.simpleDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-        this.simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+
 
         String ifModifiedSinceString = requestMessageBody.getHeaderFieldValue("If-Modified-Since");
         if ( ifModifiedSinceString != null ){
@@ -56,9 +55,8 @@ public class HEADHandler extends RequestHandler {
     @Override
     public HashMap<String, String> responseHeaders()
     {
-        // current date
-        String httpDate = this.simpleDateFormat.format(new Date(System.currentTimeMillis()));
-        headers.put("Date", httpDate);
+        super.responseHeaders();
+
 
         // content type
         headers.put("Content-Type", fileRequest.mimeType());

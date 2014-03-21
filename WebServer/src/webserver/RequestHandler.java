@@ -6,6 +6,7 @@ import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -15,11 +16,14 @@ public abstract class RequestHandler
 {
 
     protected FileRequest fileRequest;
-
+    protected SimpleDateFormat simpleDateFormat;
     protected HashMap<String, String> headers;
 
     public RequestHandler(RequestMessageBody requestMessageBody, String rootDirectory) throws HTTPException
     {
+        this.simpleDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+        this.simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+
         try {
             fileRequest = new FileRequest(rootDirectory, requestMessageBody.getURI());
         } catch( UnsupportedEncodingException e){
@@ -37,5 +41,11 @@ public abstract class RequestHandler
 
     public abstract byte[] responseBody() throws HTTPException;
 
-    public abstract HashMap<String, String> responseHeaders();
+    public HashMap<String, String> responseHeaders()
+    {
+        // current date
+        String httpDate = this.simpleDateFormat.format(new Date(System.currentTimeMillis()));
+        headers.put("Date", httpDate);
+        return headers;
+    }
 }
