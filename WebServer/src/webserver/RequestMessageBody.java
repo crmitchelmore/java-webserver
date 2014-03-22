@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 /**
  * Created by cmitchelmore on 20/03/2014.
@@ -41,19 +42,25 @@ public class RequestMessageBody extends Message {
 
         String contentLengthString = requestMessageBody.getHeaderFieldValue("Content-Length");
         if ( contentLengthString != null ){
-            long contentLength = Long.parseLong(contentLengthString);
+            byte[] bytes = new byte[1024*1024];
 
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-            int b = inputStream.read();
-            byteArrayOutputStream.write(b);
-            while ( b != -1 && --contentLength > 0 ) {
-                b = inputStream.read();
-                byteArrayOutputStream.write(b);
-            }
-            requestMessageBody.messageBody = byteArrayOutputStream.toByteArray();
-
+            int totalBytes = inputStream.read(bytes);
+            requestMessageBody.messageBody = Arrays.copyOfRange(bytes, 0, totalBytes);
         }
+//        if ( contentLengthString != null ){
+//            long contentLength = Long.parseLong(contentLengthString);
+//
+//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//
+//            int b = inputStream.read();
+//            byteArrayOutputStream.write(b);
+//            while ( b != -1 && --contentLength > 0 ) {
+//                b = inputStream.read();
+//                byteArrayOutputStream.write(b);
+//            }
+//            requestMessageBody.messageBody = byteArrayOutputStream.toByteArray();
+//
+//        }
 
         return requestMessageBody;
     }
