@@ -44,7 +44,7 @@ public class WebThread implements Runnable {
             inputStream = sock.getInputStream();
 
             // Thread creates a response message by parsing the input stream
-            RequestMessageBody requestMessageBody = null;
+            RequestMessage requestMessage = null;
             ResponseMessage responseMessage = null;
             RequestHandler requestHandler = null;
             byte[] responseBodyBytes = null;
@@ -53,7 +53,7 @@ public class WebThread implements Runnable {
 
                 try {
                     // We create a request handler, based on the request made by the user
-                    requestMessageBody = RequestMessageBody.parse(inputStream);
+                    requestMessage = RequestMessage.parse(inputStream);
                 } catch (MessageFormatException mfe) {
                     throw new HTTPException(400); //Bad Request
                 } catch (IOException ioe){
@@ -61,7 +61,7 @@ public class WebThread implements Runnable {
                 }
 
 
-                requestHandler = RequestHandlerFactory.createRequest(requestMessageBody, rootDir);
+                requestHandler = RequestHandlerFactory.createRequest(requestMessage, inputStream, rootDir);
 
                 responseBodyBytes = requestHandler.responseBody();
                 // We create a response message, by calling the method GetResponse
@@ -87,6 +87,7 @@ public class WebThread implements Runnable {
 
             //Write the response message
             responseMessage.write(outputStream);
+            //By default all messages should return a body even if it's 0 length (except 1**, 204 and 304)
             outputStream.write(responseBodyBytes);
 
             // Close this and the thread ends.

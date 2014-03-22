@@ -4,6 +4,7 @@ import in2011.http.RequestMessage;
 
 import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,13 +18,13 @@ public class HEADHandler extends RequestHandler {
 
 
 
-    public HEADHandler(RequestMessageBody requestMessageBody, String rootDir)
+    public HEADHandler(RequestMessage requestMessage, String rootDir)
     {
-        super(requestMessageBody, rootDir);
+        super(requestMessage, rootDir);
 
 
 
-        String ifModifiedSinceString = requestMessageBody.getHeaderFieldValue("If-Modified-Since");
+        String ifModifiedSinceString = requestMessage.getHeaderFieldValue("If-Modified-Since");
         if ( ifModifiedSinceString != null ){
 
             try {

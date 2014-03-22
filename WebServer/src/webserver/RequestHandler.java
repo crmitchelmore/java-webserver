@@ -3,9 +3,7 @@ package webserver;
 import in2011.http.RequestMessage;
 
 import javax.xml.ws.http.HTTPException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -17,15 +15,17 @@ public abstract class RequestHandler
 
     protected FileRequest fileRequest;
     protected SimpleDateFormat simpleDateFormat;
+    protected RequestMessage requestMessage;
     protected HashMap<String, String> headers;
 
-    public RequestHandler(RequestMessageBody requestMessageBody, String rootDirectory) throws HTTPException
+    public RequestHandler(RequestMessage requestMessage, String rootDirectory) throws HTTPException
     {
+        this.requestMessage = requestMessage;
         this.simpleDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
         this.simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         try {
-            fileRequest = new FileRequest(rootDirectory, requestMessageBody.getURI());
+            fileRequest = new FileRequest(rootDirectory, requestMessage.getURI());
         } catch( UnsupportedEncodingException e){
             throw new HTTPException(400); //Bad request e.g. the URI is not valid
         } catch (SecurityException se) {

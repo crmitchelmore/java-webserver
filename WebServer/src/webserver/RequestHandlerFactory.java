@@ -3,6 +3,7 @@ package webserver;
 import in2011.http.RequestMessage;
 
 import javax.xml.ws.http.HTTPException;
+import java.io.InputStream;
 
 /**
  * Created by George on 11/03/14.
@@ -16,25 +17,25 @@ public class RequestHandlerFactory {
 
     }
 
-    public static RequestHandler createRequest(RequestMessageBody requestMessageBody, String rootDir) throws HTTPException
+    public static RequestHandler createRequest(RequestMessage requestMessage, InputStream inputStream, String rootDir) throws HTTPException
     {
         //A comment here...
-        if ( Float.parseFloat(requestMessageBody.getVersion()) < MINIMUM_HTTP_VERSION ){
+        if ( Float.parseFloat(requestMessage.getVersion()) < MINIMUM_HTTP_VERSION ){
             throw new HTTPException(505);
         }
-        if ( requestMessageBody.getURI().length() > MAXIMUM_URI_LENGTH ){
+        if ( requestMessage.getURI().length() > MAXIMUM_URI_LENGTH ){
             throw new HTTPException(414);
         }
 
-        String method = requestMessageBody.getMethod();
+        String method = requestMessage.getMethod();
         if ( method.equals("HEAD") ){
-            return new HEADHandler(requestMessageBody, rootDir);
+            return new HEADHandler(requestMessage, rootDir);
         }else if( method.equals("GET") ) {
-            return new GETHandler(requestMessageBody, rootDir);
+            return new GETHandler(requestMessage, rootDir);
         }else if( method.equals("PUT") ){
-            return new PUTHandler(requestMessageBody, rootDir);
+            return new PUTHandler(requestMessage, inputStream, rootDir);
         }else if( method.equals("POST") ){
-            return new POSTHandler(requestMessageBody, rootDir);
+            return new POSTHandler(requestMessage, inputStream, rootDir);
         }else{
             throw new HTTPException(501);//Not implemented
         }
