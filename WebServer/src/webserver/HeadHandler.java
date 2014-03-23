@@ -15,16 +15,11 @@ import java.util.*;
  */
 public class HEADHandler extends RequestHandler {
 
-
-
-
     public HEADHandler(RequestMessage requestMessage, String rootDir)
     {
         super(requestMessage, rootDir);
 
-
-
-        String ifModifiedSinceString = requestMessage.getHeaderFieldValue("If-Modified-Since");
+        String ifModifiedSinceString = requestMessage.getHeaderFieldValue(HEADER_IF_MODIFIED_SINCE);
         if ( ifModifiedSinceString != null ){
 
             try {
@@ -32,7 +27,7 @@ public class HEADHandler extends RequestHandler {
                 if ( ifModifiedSince.compareTo(fileRequest.lastModified()) >= 0 ){
                     throw new HTTPException(304); //Not modified
                 }
-            }catch (ParseException pe ){
+            }catch (ParseException pe){
                 throw new HTTPException(400); //Bad Request. There might be a case to just ignore this error as we could continue.
             }
 
@@ -58,16 +53,15 @@ public class HEADHandler extends RequestHandler {
     {
         super.responseHeaders();
 
-
         // content type
-        headers.put("Content-Type", fileRequest.mimeType());
+        headers.put(HEADER_CONTENT_TYPE, fileRequest.mimeType());
 
         // last modified
         String lastModified = this.simpleDateFormat.format(fileRequest.lastModified());
-        headers.put("Last-Modified", lastModified);
+        headers.put(HEADER_LAST_MODIFIED, lastModified);
 
-
-        headers.put("Content-Length", "" + fileRequest.fileSize());
+        // content length
+        headers.put(HEADER_CONTENT_LENGTH, "" + fileRequest.fileSize());
         return headers;
     }
 }

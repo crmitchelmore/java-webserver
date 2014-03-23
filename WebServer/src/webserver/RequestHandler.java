@@ -3,7 +3,10 @@ package webserver;
 import in2011.http.RequestMessage;
 
 import javax.xml.ws.http.HTTPException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -12,30 +15,96 @@ import java.util.*;
  */
 public abstract class RequestHandler
 {
+    public static final int MAX_CONTENT_LENGTH = 1024*1024;
+    public static final String HEADER_CONTENT_LENGTH = "Content-Length";
+    public static final String HEADER_DATE = "Date";
+    public static final String HEADER_LAST_MODIFIED = "Last-Modified";
+    public static final String HEADER_IF_MODIFIED_SINCE = "If-Modified-Since";
+    public static final String HEADER_CONTENT_TYPE = "Content-Type";
 
+    public static final String TIMEZONE = "GMT";
+    public static final String DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
+    public static final String STRING_ENCODING = "UTF-8";
     protected FileRequest fileRequest;
     protected SimpleDateFormat simpleDateFormat;
     protected RequestMessage requestMessage;
     protected HashMap<String, String> headers;
 
+    protected HashMap<String, String> parameters;
+
+    public HashMap<String, String> getParameters() {
+        return parameters;
+    }
+
+
     public RequestHandler(RequestMessage requestMessage, String rootDirectory) throws HTTPException
     {
         this.requestMessage = requestMessage;
-        this.simpleDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-        this.simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        this.simpleDateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.UK);
+        this.simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
+        this.parameters = new HashMap<>();
+        this.headers = new HashMap<>();
 
         try {
-            fileRequest = new FileRequest(rootDirectory, requestMessage.getURI());
+            String uri = requestMessage.getURI().substring(1); //Chop the leading
+            //Extract params
+            int paramMarkerIndex = uri.indexOf("?");
+            if ( paramMarkerIndex > 0 ){
+
+                int fragmentMarkerIndex = uri.indexOf("#");
+                int end = fragmentMarkerIndex > 0 ? fragmentMarkerIndex : uri.length();
+                String paramString = uri.substring(paramMarkerIndex + 1, end);
+                HashMap<String, String> getParams = extractURLEncodedParamsFromString(paramString);
+                this.parameters.putAll(getParams);
+                uri = uri.substring(0, paramMarkerIndex);
+            }
+
+            String decodedURI =  URLDecoder.decode(uri, STRING_ENCODING); //Remove hex Maybe use ISO-8859-1
+
+            fileRequest = new FileRequest(rootDirectory, decodedURI);
         } catch( UnsupportedEncodingException e){
             throw new HTTPException(400); //Bad request e.g. the URI is not valid
         } catch (SecurityException se) {
             throw new HTTPException(403); //Forbidden. URI is not contained by rootDirectory
         }
-        headers = new HashMap<String, String>();
     }
-    public HashMap<String, String> getParameters() {
-        return fileRequest.getParameters();
+
+    protected HashMap<String, String> extractURLEncodedParamsFromString(String paramString) throws UnsupportedEncodingException
+    {
+        String[] params = paramString.split("&");
+        HashMap<String, String> paramsHashMap = new HashMap<>();
+        for ( String param : params ){
+            String[] keyValue = param.split("=");
+            String key = URLDecoder.decode(keyValue[0], STRING_ENCODING);
+            String value = URLDecoder.decode(keyValue[1], STRING_ENCODING);
+            paramsHashMap.put(key,value);
+        }
+        return paramsHashMap;
     }
+
+    protected byte[] bodyBytesFromInputStream(InputStream inputStream) throws IOException
+    {
+        byte[] bytes = new byte[MAX_CONTENT_LENGTH];
+        String contentLengthString = this.requestMessage.getHeaderFieldValue(HEADER_CONTENT_LENGTH);
+        if ( contentLengthString != null ){
+            int totalBytes = inputStream.read(bytes);
+            if ( totalBytes > 0 ){
+                return  Arrays.copyOfRange(bytes, 0, totalBytes);
+            }
+        }
+        return null;
+    }
+
+
+    protected String bytesToString(byte[] bytes)
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+        for ( byte b : bytes ){
+            stringBuilder.append((char)b);
+        }
+        return stringBuilder.toString();
+    }
+
 
     public abstract int httpResponseCode();
 
@@ -45,7 +114,7 @@ public abstract class RequestHandler
     {
         // current date
         String httpDate = this.simpleDateFormat.format(new Date(System.currentTimeMillis()));
-        headers.put("Date", httpDate);
+        headers.put(HEADER_DATE, httpDate);
         return headers;
     }
 }

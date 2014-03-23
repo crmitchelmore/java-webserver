@@ -16,57 +16,30 @@ import java.util.Map;
  */
 public class PUTHandler extends RequestHandler {
 
-    private static final long MAX_FILE_SIZE = 1024 * 1024;
 
     public PUTHandler(RequestMessage requestMessage, InputStream inputStream, String rootDirectory)
     {
         super(requestMessage, rootDirectory);
 
-        String contentLengthString = requestMessage.getHeaderFieldValue("Content-Length");
+        String contentLengthString = requestMessage.getHeaderFieldValue(HEADER_CONTENT_LENGTH);
         if ( contentLengthString == null ){
             throw new HTTPException(411);//Client must specify content length
         }
         long contentLength = Long.parseLong(contentLengthString);
 
-        if ( contentLength > MAX_FILE_SIZE ){
+        if ( contentLength > MAX_CONTENT_LENGTH ){
             throw new HTTPException(413);//Entity too large
         }
         try {
-            byte[] bytes = getMessageBodyBytesFromInputStream(inputStream);
+            byte[] bytes = bodyBytesFromInputStream(inputStream);
             if ( bytes != null && bytes.length > 0 ){
-                fileRequest.createFileOrFolderWithBytes(bytes, MAX_FILE_SIZE);
+                fileRequest.createFileOrFolderWithBytes(bytes, MAX_CONTENT_LENGTH);
             }
         }catch (SecurityException s){
             throw new HTTPException(409);//Conflict
-        }catch ( IOException s){
+        }catch (IOException s){
             throw new HTTPException(500);//Internal server error
         }
-    }
-
-    public byte[] getMessageBodyBytesFromInputStream(InputStream inputStream) throws IOException
-    {
-        String contentLengthString = this.requestMessage.getHeaderFieldValue("Content-Length");
-        if ( contentLengthString != null ){
-            byte[] bytes = new byte[1024*1024];
-
-            int totalBytes = inputStream.read(bytes);
-            return Arrays.copyOfRange(bytes, 0, totalBytes);
-        }
-        return null;
-//        if ( contentLengthString != null ){
-//            long contentLength = Long.parseLong(contentLengthString);
-//
-//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//
-//            int b = inputStream.read();
-//            byteArrayOutputStream.write(b);
-//            while ( b != -1 && --contentLength > 0 ) {
-//                b = inputStream.read();
-//                byteArrayOutputStream.write(b);
-//            }
-//            requestMessageBody.messageBody = byteArrayOutputStream.toByteArray();
-//
-//        }
     }
 
     @Override
@@ -76,12 +49,14 @@ public class PUTHandler extends RequestHandler {
     }
 
     @Override
-    public byte[] responseBody() throws HTTPException{
+    public byte[] responseBody() throws HTTPException
+    {
         return new byte[0];
     }
 
     @Override
-    public HashMap<String, String> responseHeaders() {
+    public HashMap<String, String> responseHeaders()
+    {
         super.responseHeaders();
 
         return headers;

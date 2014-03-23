@@ -14,8 +14,8 @@ public class GETHandler extends HEADHandler {
     public GETHandler(RequestMessage requestMessage, String rootDir)
     {
         super(requestMessage, rootDir);
-
     }
+
     @Override
     public byte[] responseBody() throws HTTPException
     {
