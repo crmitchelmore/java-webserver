@@ -30,6 +30,16 @@ public class FileRequest {
         }
     }
 
+    //REturns yes if there is some kind of content avaialble
+    public boolean hasContent()
+    {
+        try {
+            byte[] bytes = fileBytes();
+            return bytes != null && bytes.length > 0;
+        }catch (IOException e){
+            return false;
+        }
+    }
 
     public byte[] fileBytes() throws IOException
     {
@@ -143,9 +153,9 @@ public class FileRequest {
     }
 
 
-    public boolean deleteFile()
+    public void delete() throws IOException
     {
-        return true;
+        Files.delete(this.absolutePath);
     }
 
 //This is currently only used by logger so no protection is given

@@ -60,9 +60,11 @@ public class WebServer {
     public void start() throws IOException
     {
         ServerSocket serverSock = new ServerSocket(port);
-        Logger.createNewLogFile(LOG_FILE_NAME);
+        if ( logging ){
+            Logger.createNewLogFile(rootDir, LOG_FILE_NAME);
+        }
         while (true) {
-            Socket socket = serverSock.accept();
+            Socket socket = serverSock.accept(); //Maybe catch this and recover sooner?
             System.out.println(c++);
             WebThread webThread = new WebThread(socket, rootDir, logging);
             Thread t = new Thread(webThread);

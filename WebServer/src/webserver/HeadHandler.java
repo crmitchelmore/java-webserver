@@ -17,7 +17,7 @@ public class HEADHandler extends RequestHandler {
         super(requestMessage, rootDir);
 
         String ifModifiedSinceString = requestMessage.getHeaderFieldValue(HEADER_IF_MODIFIED_SINCE);
-        if ( ifModifiedSinceString != null ){
+        if ( ifModifiedSinceString != null && fileRequest.hasContent() ){
 
             try {
                 Date ifModifiedSince = this.simpleDateFormat.parse(ifModifiedSinceString);
@@ -43,13 +43,8 @@ public class HEADHandler extends RequestHandler {
     @Override
     public byte[] responseBody() throws HTTPException
     {
-        try {
-            byte[] bytes = this.fileRequest.fileBytes();
-            if ( bytes == null ){
-                throw new HTTPException(404); //Not found
-            }
-        }catch (IOException ioe){
-            throw new HTTPException(500); //Internal server error
+        if ( !fileRequest.hasContent() ){
+             throw new HTTPException(404); //Not found
         }
         // This is not the best way to get here but I don't know how to move this code because the fileBytes is the definitive value for any of the file existing options.
         return new byte[0];

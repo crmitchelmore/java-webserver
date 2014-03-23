@@ -11,10 +11,11 @@ public class Logger {
     private static int id = 0;
     private static FileRequest logFile = null;
 
-    public static void createNewLogFile(String rootDir) throws IOException
+    public static void createNewLogFile(String rootDir, String logFileName) throws IOException
     {
-        logFile = new FileRequest(rootDir, WebServer.LOG_FILE_NAME);
-        //Delete old one first
+        logFile = new FileRequest(rootDir, logFileName);
+        logFile.delete();
+        //Delete old one first if there is one
         logFile.createFileOrFolderWithBytes(new byte[0]);
     }
 
