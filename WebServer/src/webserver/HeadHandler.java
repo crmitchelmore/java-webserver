@@ -3,11 +3,7 @@ package webserver;
 import in2011.http.RequestMessage;
 
 import javax.xml.ws.http.HTTPException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -49,9 +45,9 @@ public class HEADHandler extends RequestHandler {
     }
 
     @Override
-    public HashMap<String, String> responseHeaders()
+    public HashMap<String, String> buildResponseHeaders()
     {
-        super.responseHeaders();
+        super.buildResponseHeaders();
 
         // content type
         headers.put(HEADER_CONTENT_TYPE, fileRequest.mimeType());

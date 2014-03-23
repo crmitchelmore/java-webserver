@@ -29,7 +29,7 @@ public class FileRequest {
             throw new SecurityException();
         }
     }
-    
+
 
     public byte[] fileBytes() throws IOException
     {
@@ -42,6 +42,7 @@ public class FileRequest {
         if ( fileExists() ){
             return Files.readAllBytes(this.absolutePath);
         }
+
         if ( isDirectory() ){
             File indexHTML = this.indexPage();
             if ( indexHTML != null ){

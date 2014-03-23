@@ -8,7 +8,6 @@ import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
 
@@ -63,13 +62,14 @@ public class WebThread implements Runnable {
 
                 requestHandler = RequestHandlerFactory.createRequest(requestMessage, inputStream, rootDir);
 
+
                 responseBodyBytes = requestHandler.responseBody();
                 // We create a response message, by calling the method GetResponse
                 // which handles parsing the given response
                 responseMessage =   new ResponseMessage(requestHandler.httpResponseCode());
 
                 // We add the headers to the response message
-                for( Map.Entry<String, String> entry : requestHandler.responseHeaders().entrySet() ){
+                for( Map.Entry<String, String> entry : requestHandler.buildResponseHeaders().entrySet() ){
 
                     responseMessage.addHeaderField(entry.getKey(), entry.getValue());
 
@@ -84,7 +84,7 @@ public class WebThread implements Runnable {
             }
 
 
-
+            System.out.println("Status code: "+responseMessage.getStatusCode());
             //Write the response message
             responseMessage.write(outputStream);
             //By default all messages should return a body even if it's 0 length (except 1**, 204 and 304)

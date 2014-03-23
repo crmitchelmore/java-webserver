@@ -1,14 +1,11 @@
 package webserver;
 
-import in2011.http.MessageFormatException;
 import in2011.http.RequestMessage;
 
 import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -59,9 +56,9 @@ public class POSTHandler extends  RequestHandler
     }
 
     @Override
-    public HashMap<String, String> responseHeaders()
+    public HashMap<String, String> buildResponseHeaders()
     {
-        super.responseHeaders();
+        super.buildResponseHeaders();
         return headers;
     }
 }

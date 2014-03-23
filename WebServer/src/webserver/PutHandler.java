@@ -2,14 +2,10 @@ package webserver;
 
 import in2011.http.RequestMessage;
 
-import javax.print.DocFlavor;
 import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by George on 11/03/14.
@@ -55,9 +51,9 @@ public class PUTHandler extends RequestHandler {
     }
 
     @Override
-    public HashMap<String, String> responseHeaders()
+    public HashMap<String, String> buildResponseHeaders()
     {
-        super.responseHeaders();
+        super.buildResponseHeaders();
 
         return headers;
     }

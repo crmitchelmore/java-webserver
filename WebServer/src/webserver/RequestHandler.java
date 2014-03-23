@@ -48,17 +48,7 @@ public abstract class RequestHandler
         try {
             String uri = requestMessage.getURI().substring(1); //Chop the leading
             //Extract params
-            int paramMarkerIndex = uri.indexOf("?");
-            if ( paramMarkerIndex > 0 ){
-
-                int fragmentMarkerIndex = uri.indexOf("#");
-                int end = fragmentMarkerIndex > 0 ? fragmentMarkerIndex : uri.length();
-                String paramString = uri.substring(paramMarkerIndex + 1, end);
-                HashMap<String, String> getParams = extractURLEncodedParamsFromString(paramString);
-                this.parameters.putAll(getParams);
-                System.out.println("Get Params: "+ this.parameters);
-                uri = uri.substring(0, paramMarkerIndex);
-            }
+            uri = extractParamsFromURI(uri);
 
             String decodedURI =  URLDecoder.decode(uri, STRING_ENCODING); //Remove hex Maybe use ISO-8859-1
 
@@ -88,12 +78,32 @@ public abstract class RequestHandler
         byte[] bytes = new byte[MAX_CONTENT_LENGTH];
         String contentLengthString = this.requestMessage.getHeaderFieldValue(HEADER_CONTENT_LENGTH);
         if ( contentLengthString != null ){
+            System.out.print("Start read...");
             int totalBytes = inputStream.read(bytes);
+            System.out.println(" Finish read");
             if ( totalBytes > 0 ){
                 return  Arrays.copyOfRange(bytes, 0, totalBytes);
             }
         }
         return null;
+    }
+
+
+    protected String extractParamsFromURI(String uri) throws UnsupportedEncodingException
+    {
+        int paramMarkerIndex = uri.indexOf("?");
+        if ( paramMarkerIndex > 0 ){
+
+            int fragmentMarkerIndex = uri.indexOf("#");
+            int end = fragmentMarkerIndex > 0 ? fragmentMarkerIndex : uri.length();
+            String paramString = uri.substring(paramMarkerIndex + 1, end);
+            HashMap<String, String> getParams = extractURLEncodedParamsFromString(paramString);
+            this.parameters.putAll(getParams);
+            System.out.println("Get Params: "+ this.parameters);
+
+            return uri.substring(0, paramMarkerIndex); //URI without params
+        }
+        return uri;
     }
 
 
@@ -111,7 +121,7 @@ public abstract class RequestHandler
 
     public abstract byte[] responseBody() throws HTTPException;
 
-    public HashMap<String, String> responseHeaders()
+    public HashMap<String, String> buildResponseHeaders()
     {
         // current date
         String httpDate = this.simpleDateFormat.format(new Date(System.currentTimeMillis()));
