@@ -88,7 +88,9 @@ public class WebThread implements Runnable {
 
             }
 
-            int responseCode = responseMessage.getStatusCode();
+            final int responseCode = responseMessage.getStatusCode();
+            final String absoluteURI = requestHandler.absoluteURI();
+            final String method = requestMessage.getMethod();
             System.out.println("Status code: "+responseCode);
             //Write the response message
             responseMessage.write(outputStream);
@@ -97,6 +99,15 @@ public class WebThread implements Runnable {
             if ( !(responseCode/100 == 1 || responseCode == 204 || responseCode == 304) ){
                 outputStream.write(responseBodyBytes);
             }
+
+            //Logging is done synchronously but we don't want to hold up closing this thread
+            new Thread(new Runnable() {
+                public void run() {
+                    Logger.addLogSynchronous(method, absoluteURI, responseCode);
+
+                }
+            }).start();
+
 
             // Close this and the thread ends.
 

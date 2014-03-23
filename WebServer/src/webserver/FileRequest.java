@@ -143,6 +143,22 @@ public class FileRequest {
     }
 
 
+    public boolean deleteFile()
+    {
+        return true;
+    }
+
+//This is currently only used by logger so no protection is given
+    public boolean appendLineToFile(String line)
+    {
+        try {
+            Files.write(this.absolutePath, line.getBytes(), StandardOpenOption.APPEND);
+        }catch (IOException e){
+            return false;
+        }
+        return true;
+    }
+
 
     // Search through the index extensions and return the first that is found or null.
     private File indexPage()
@@ -163,7 +179,7 @@ public class FileRequest {
     }
 
 
-    // Compile a directory listing for the c
+    // Compile a directory listing for the direcotyr
     private String directoryStructure() throws IOException
     {
         try (  DirectoryStream<Path> stream = Files.newDirectoryStream(this.absolutePath) ){

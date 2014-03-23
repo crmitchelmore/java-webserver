@@ -1,11 +1,13 @@
 package webserver;
 
+import com.sun.org.apache.xpath.internal.operations.*;
 import in2011.http.RequestMessage;
 
 import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.String;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -15,7 +17,7 @@ import java.util.*;
  */
 public abstract class RequestHandler
 {
-    public static final int MAX_CONTENT_LENGTH = 1024*1024;
+
     public static final String HEADER_CONTENT_LENGTH = "Content-Length";
     public static final String HEADER_DATE = "Date";
     public static final String HEADER_LAST_MODIFIED = "Last-Modified";
@@ -60,6 +62,23 @@ public abstract class RequestHandler
         }
     }
 
+    public abstract int httpResponseCode();
+
+    public abstract byte[] responseBody() throws HTTPException;
+
+    public HashMap<String, String> buildResponseHeaders()
+    {
+        // current date
+        String httpDate = this.simpleDateFormat.format(new Date(System.currentTimeMillis()));
+        headers.put(HEADER_DATE, httpDate);
+        return headers;
+    }
+
+    public String absoluteURI()
+    {
+        return fileRequest.absolutePath.toString();
+    }
+
     protected HashMap<String, String> extractURLEncodedParamsFromString(String paramString) throws UnsupportedEncodingException
     {
         String[] params = paramString.split("&");
@@ -75,7 +94,7 @@ public abstract class RequestHandler
 
     protected byte[] bodyBytesFromInputStream(InputStream inputStream) throws IOException
     {
-        byte[] bytes = new byte[MAX_CONTENT_LENGTH];
+        byte[] bytes = new byte[WebServer.MAX_CONTENT_LENGTH];
         String contentLengthString = this.requestMessage.getHeaderFieldValue(HEADER_CONTENT_LENGTH);
         if ( contentLengthString != null ){
 
@@ -125,15 +144,4 @@ public abstract class RequestHandler
     }
 
 
-    public abstract int httpResponseCode();
-
-    public abstract byte[] responseBody() throws HTTPException;
-
-    public HashMap<String, String> buildResponseHeaders()
-    {
-        // current date
-        String httpDate = this.simpleDateFormat.format(new Date(System.currentTimeMillis()));
-        headers.put(HEADER_DATE, httpDate);
-        return headers;
-    }
 }

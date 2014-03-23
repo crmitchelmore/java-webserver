@@ -23,7 +23,7 @@ public class PUTHandler extends RequestHandler {
         }
         long contentLength = Long.parseLong(contentLengthString);
 
-        if ( contentLength > MAX_CONTENT_LENGTH ){
+        if ( contentLength > WebServer.MAX_CONTENT_LENGTH ){
             throw new HTTPException(413);//Entity too large
         }
         try {

@@ -14,6 +14,8 @@ import javax.xml.ws.http.HTTPException;
 public class WebServer {
 
 
+    public static final int MAX_CONTENT_LENGTH = 1024*1024;
+    public static final String LOG_FILE_NAME = "webserverIN2011.log";
     public static void main(String[] args) throws IOException {
         String usage = "Usage: java webserver.WebServer <port-number> <root-dir> (\"0\" | \"1\")";
 
@@ -58,7 +60,7 @@ public class WebServer {
     public void start() throws IOException
     {
         ServerSocket serverSock = new ServerSocket(port);
-
+        Logger.createNewLogFile(LOG_FILE_NAME);
         while (true) {
             Socket socket = serverSock.accept();
             System.out.println(c++);
