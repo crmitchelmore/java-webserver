@@ -3,6 +3,7 @@ package webserver;
 import in2011.http.MessageFormatException;
 import in2011.http.RequestMessage;
 import in2011.http.ResponseMessage;
+import in2011.http.StatusCodes;
 
 import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
@@ -81,8 +82,9 @@ public class WebThread implements Runnable {
 
             }catch (HTTPException httpException){
 
-                responseMessage = new ResponseMessage(httpException.getStatusCode());
-                responseBodyBytes = ("<h1>ERROR : "+responseMessage.getStatusCode() + "</h1>").getBytes();
+                int responseCode = httpException.getStatusCode();
+                responseMessage = new ResponseMessage(responseCode);
+                responseBodyBytes = ("<html><h1>ERROR : "+ responseCode + "</h1>\n <h2>"+ StatusCodes.reasonPhraseFromCode(responseCode) + "</h2></html>").getBytes();
 
             }
 

@@ -78,12 +78,20 @@ public abstract class RequestHandler
         byte[] bytes = new byte[MAX_CONTENT_LENGTH];
         String contentLengthString = this.requestMessage.getHeaderFieldValue(HEADER_CONTENT_LENGTH);
         if ( contentLengthString != null ){
+
             System.out.print("Start read...");
-            int totalBytes = inputStream.read(bytes);
-            System.out.println(" Finish read");
-            if ( totalBytes > 0 ){
-                return  Arrays.copyOfRange(bytes, 0, totalBytes);
+            int offset = 0;
+            int totalBytes = 0;
+
+            final int PageSize = 16384; //Have to read in pages because large files don't fit in buffer otherwise
+            while ( (offset = inputStream.read(bytes, totalBytes, PageSize)) == PageSize ){
+                totalBytes+=offset;
             }
+            totalBytes+=offset;
+
+            System.out.println(" Finish read");
+            return  Arrays.copyOfRange(bytes, 0, totalBytes);
+
         }
         return null;
     }
