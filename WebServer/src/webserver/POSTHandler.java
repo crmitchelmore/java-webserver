@@ -33,6 +33,7 @@ public class POSTHandler extends  RequestHandler
         }
         try {
             this.postParams.putAll(extractURLEncodedParamsFromString(bodyString));
+            System.out.println("Post Params: "+ this.postParams);
         }catch (UnsupportedEncodingException uee){
             throw new HTTPException(400); //Bad Request
         }

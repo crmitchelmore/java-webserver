@@ -28,6 +28,7 @@ public class RequestHandlerFactory {
         }
 
         String method = requestMessage.getMethod();
+        System.out.println("Method: " + method);
         if ( method.equals("HEAD") ){
             return new HEADHandler(requestMessage, rootDir);
         }else if( method.equals("GET") ) {

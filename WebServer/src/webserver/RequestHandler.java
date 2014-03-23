@@ -56,6 +56,7 @@ public abstract class RequestHandler
                 String paramString = uri.substring(paramMarkerIndex + 1, end);
                 HashMap<String, String> getParams = extractURLEncodedParamsFromString(paramString);
                 this.parameters.putAll(getParams);
+                System.out.println("Get Params: "+ this.parameters);
                 uri = uri.substring(0, paramMarkerIndex);
             }
 

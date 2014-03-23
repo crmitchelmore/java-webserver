@@ -20,7 +20,7 @@ public class GETHandler extends HEADHandler {
     public byte[] responseBody() throws HTTPException
     {
         try {
-            byte[] bytes = this.fileRequest.getFileBytes();
+            byte[] bytes = this.fileRequest.fileBytes();
             if ( bytes == null ){
                 throw new HTTPException(404); //Not found
             }

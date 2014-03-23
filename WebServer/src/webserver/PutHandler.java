@@ -33,7 +33,7 @@ public class PUTHandler extends RequestHandler {
         try {
             byte[] bytes = bodyBytesFromInputStream(inputStream);
             if ( bytes != null && bytes.length > 0 ){
-                fileRequest.createFileOrFolderWithBytes(bytes, MAX_CONTENT_LENGTH);
+                fileRequest.createFileOrFolderWithBytes(bytes);
             }
         }catch (SecurityException s){
             throw new HTTPException(409);//Conflict

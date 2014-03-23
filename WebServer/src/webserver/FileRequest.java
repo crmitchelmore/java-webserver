@@ -1,20 +1,11 @@
 package webserver;
 
-import javax.xml.ws.http.HTTPException;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLConnection;
-import java.net.URLDecoder;
 import java.nio.file.*;
-import java.nio.file.attribute.FileTime;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by cmitchelmore on 11/03/2014.
@@ -25,6 +16,7 @@ public class FileRequest {
     protected Path rootDirectory;
     protected Path absolutePath;
     protected String decodedURI;
+    protected String[] indexExtensions = {"index.html"};
 
     public FileRequest(String rootDirectory, String uri) throws SecurityException //throw new ;//Bad Request
     {
@@ -37,8 +29,9 @@ public class FileRequest {
             throw new SecurityException();
         }
     }
+    
 
-    public byte[] getFileBytes() throws IOException
+    public byte[] fileBytes() throws IOException
     {
         boolean isSymbolic = Files.isSymbolicLink(this.absolutePath);
 
@@ -50,7 +43,7 @@ public class FileRequest {
             return Files.readAllBytes(this.absolutePath);
         }
         if ( isDirectory() ){
-            File indexHTML = this.indexHTML();
+            File indexHTML = this.indexPage();
             if ( indexHTML != null ){
                 return Files.readAllBytes(indexHTML.toPath());
             }
@@ -59,27 +52,109 @@ public class FileRequest {
         return null;
     }
 
+
     //Returns true if the absolute path exists, is a directory and is not a sym link
     public boolean isDirectory()
     {
         return Files.isDirectory(this.absolutePath, LinkOption.NOFOLLOW_LINKS);
     }
 
+
     public Date lastModified()
     {
-        File f = indexHTML();
+        File f = indexPage();
+        // If we are using the index HTML page get the last modified date of that
         if ( f != null ){
             return new Date(f.lastModified());
         }else if ( fileExists() || isDirectory() ){
+            // Otherwise return the last mofied date for the file or folder
             return new Date(new File(this.absolutePath.toUri()).lastModified());
         }
         return null;
     }
 
-    private File indexHTML()
+
+    public long fileSize()
     {
-        return this.getFileAtPathIfExists("index.html");
+        try {
+            byte[] bytes = fileBytes();
+            return bytes.length; //Should find a better way to do this
+        }catch (IOException e){
+            return 0;
+        }
     }
+
+
+    // The byte array will all be written to file. Any management of file size should be done before calling this mehtod.
+    public void createFileOrFolderWithBytes(byte[] bytes) throws IOException, SecurityException
+    {
+
+        if ( fileExists() ){
+            throw new SecurityException();
+        }
+
+        Path decodedURIPath = Paths.get(this.decodedURI);
+        int pathComponents = decodedURIPath.getNameCount();
+
+        // Create any parent directories if they don't exist. No error is thrown if they do
+        // The parent directory is all path components up to the file name
+        if ( pathComponents > 1 ){
+            Path directoryStructure = decodedURIPath.subpath(0, pathComponents-1);
+            Files.createDirectories(this.rootDirectory.resolve(directoryStructure));
+        }
+
+        if ( isDirectory() ){// Create a directory
+            Files.createDirectory(this.absolutePath);
+        }else{
+            if ( bytes != null ){ //Write max of maxLength
+                //Use the CREATE_NEW option for atomic file creation
+                Files.write(this.absolutePath, bytes, StandardOpenOption.CREATE_NEW);
+            }
+        }
+
+    }
+
+
+    public String mimeType()
+    {
+        File file = indexPage();
+        String type = null;
+
+        // If it's a directory and there's no index page then it's the html we build
+        if ( isDirectory() && file == null ){
+            return "text/html";
+        }
+
+        try {
+            // If we have index page then probe its path else probe our absolute path
+            Path path = file == null ? this.absolutePath : Paths.get(file.getAbsolutePath());
+            type = Files.probeContentType(path);
+
+        } catch (IOException x) {
+            x.printStackTrace();
+        }
+        if ( type == null ){
+            // If we haven't had any luck so far try guessing the content type
+            String fileName = file == null ? this.decodedURI : file.getPath();
+            type = URLConnection.guessContentTypeFromName(fileName);
+        }
+        return type;
+    }
+
+
+
+    // Search through the index extensions and return the first that is found or null.
+    private File indexPage()
+    {
+        for ( String indexExtension : this.indexExtensions ){
+            File file = fileFromCurrentDirectoryWithPathExtension(indexExtension);
+            if ( file != null ){
+                return file;
+            }
+        }
+        return null;
+    }
+
 
     private boolean fileExists()
     {
@@ -87,21 +162,22 @@ public class FileRequest {
     }
 
 
+    // Compile a directory listing for the c
+    private String directoryStructure() throws IOException
+    {
+        try (  DirectoryStream<Path> stream = Files.newDirectoryStream(this.absolutePath) ){
 
-    private String directoryStructure() throws IOException {
-        DirectoryStream<Path> stream = null;
-        String s = null;
-        try {
             StringBuilder builder = new StringBuilder("<html>\n<head><title>" + this.decodedURI + "</title></head>\n");
 
-            builder.append("<body>\n<h1>");
-            builder.append("<a href=\"/\">home</a>");
+            builder.append("<body>\n<h1>\n");
 
+            // Build a bread crumb
+            builder.append("<a href=\"/\">home</a>");
             Path relativeDirectory = this.rootDirectory.relativize(this.absolutePath);
             Iterator it = relativeDirectory.iterator();
             Path partial = Paths.get("/");
-            while( it.hasNext() )
-            {
+
+            while( it.hasNext() ) {
                 Path p = (Path)it.next();
                 partial = partial.resolve(p);
                 if ( it.hasNext() ){
@@ -109,61 +185,38 @@ public class FileRequest {
                 }else {
                     builder.append(" / "+p.toString());
                 }
-
             }
-
             builder.append("</h1><br>");
+            // End of bread crumb
 
-            stream = Files.newDirectoryStream(this.absolutePath);
 
-
+            // Build out directory structure
             int absolutePathCount = this.absolutePath.getNameCount();
-            for (Path file: stream) {
+            for ( Path file: stream ) {
                 Path resolved = file.subpath(absolutePathCount, file.getNameCount());
 
                 Path resolvedTarget = this.rootDirectory.relativize(file);
+
+                // Add 'Dir' for directories
                 String directory = Files.isDirectory(file) ? "Dir: " : "";
-                if ( !Files.isSymbolicLink(resolved) ){
+
+                // Don't show sym links or hidden files
+                if ( !Files.isSymbolicLink(resolved) && !Files.isHidden(resolved) ){
                     builder.append(directory + "<a href=\"/" + resolvedTarget.toString() + "\">" + resolved.toString() + "</a><br>");
                 }
 
             }
-
             builder.append("</body>\n</html>");
-            s = builder.toString();
-        } finally {
-            if ( stream != null ){
-                stream.close();
-            }
+
+            // Send back everything as a string.
+            return builder.toString();
         }
 
-        return s;
     }
-
-
-    public String mimeType(){
-        String type = "text/html";
-        File f = indexHTML();
-        if ( f != null || isDirectory() ){ //Index.html  or the html we generate.
-            return type;
-        }
-        try {
-            type = Files.probeContentType(this.absolutePath);
-        } catch (IOException x) {
-            type = "Unknown";
-            x.printStackTrace();
-        }
-        if ( type == null ){
-            type = URLConnection.guessContentTypeFromName(this.decodedURI);
-        }
-        return type;
-    }
-
-
 
 
     //If there is a file at the path extension then return it. No sym links.
-    private File getFileAtPathIfExists(String pathExtension)
+    private File fileFromCurrentDirectoryWithPathExtension(String pathExtension)
     {
         if ( isDirectory() ){
             Path extendedPath = this.absolutePath.resolve(pathExtension);
@@ -174,46 +227,5 @@ public class FileRequest {
         }
         return null;
     }
-
-    public long fileSize()
-    {
-        try {
-            byte[] bytes = getFileBytes();
-            return bytes.length; //Should find a better way to do this
-        }catch (IOException e){
-            return 0;
-        }
-    }
-
-
-
-
-    public void createFileOrFolderWithBytes(byte[] bytes, long maxLength) throws IOException, SecurityException {
-        //atomic...
-
-        if ( fileExists() ){
-            throw new SecurityException();
-        }
-
-        Path decodedURIPath = Paths.get(this.decodedURI);
-        int pathComponents = decodedURIPath.getNameCount();
-        if ( pathComponents > 1 ){
-            Path directoryStructure = decodedURIPath.subpath(0, pathComponents-1);
-            Files.createDirectories(this.rootDirectory.resolve(directoryStructure));
-        }
-
-        if ( isDirectory() ){//file
-            Files.createDirectory(this.absolutePath);
-        }else{//folder
-            if ( bytes != null ){ //Write max of maxLength
-                Files.write(this.absolutePath, bytes);
-            }
-        }
-
-    }
-
-
-
-
 
 }
