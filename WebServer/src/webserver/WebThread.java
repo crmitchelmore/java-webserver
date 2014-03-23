@@ -83,12 +83,15 @@ public class WebThread implements Runnable {
 
             }
 
-
-            System.out.println("Status code: "+responseMessage.getStatusCode());
+            int responseCode = responseMessage.getStatusCode();
+            System.out.println("Status code: "+responseCode);
             //Write the response message
             responseMessage.write(outputStream);
+
             //By default all messages should return a body even if it's 0 length (except 1**, 204 and 304)
-            outputStream.write(responseBodyBytes);
+            if ( !(responseCode/100 == 1 || responseCode == 204 || responseCode == 304) ){
+                outputStream.write(responseBodyBytes);
+            }
 
             // Close this and the thread ends.
 

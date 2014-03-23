@@ -3,6 +3,7 @@ package webserver;
 import in2011.http.RequestMessage;
 
 import javax.xml.ws.http.HTTPException;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
@@ -40,8 +41,18 @@ public class HEADHandler extends RequestHandler {
     }
 
     @Override
-    public byte[] responseBody() throws HTTPException{
-        return null;
+    public byte[] responseBody() throws HTTPException
+    {
+        try {
+            byte[] bytes = this.fileRequest.fileBytes();
+            if ( bytes == null ){
+                throw new HTTPException(404); //Not found
+            }
+        }catch (IOException ioe){
+            throw new HTTPException(500); //Internal server error
+        }
+        // This is not the best way to get here but I don't know how to move this code because the fileBytes is the definitive value for any of the file existing options.
+        return new byte[0];
     }
 
     @Override
