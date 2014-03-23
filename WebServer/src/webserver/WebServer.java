@@ -62,7 +62,7 @@ public class WebServer {
         while (true) {
             Socket socket = serverSock.accept();
             System.out.println(c++);
-            WebThread webThread = new WebThread(socket, rootDir);
+            WebThread webThread = new WebThread(socket, rootDir, logging);
             Thread t = new Thread(webThread);
             t.start();
         }

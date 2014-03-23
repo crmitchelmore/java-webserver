@@ -18,8 +18,11 @@ public class WebThread implements Runnable {
 
     private Socket sock;
     private String rootDir;
-    public WebThread(Socket sock, String rootDir)
+    private boolean logging;
+
+    public WebThread(Socket sock, String rootDir, boolean logging)
     {
+        this.logging = logging;
         this.sock = sock;
         this.rootDir = rootDir;
     }
