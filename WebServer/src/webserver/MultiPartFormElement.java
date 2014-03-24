@@ -32,7 +32,7 @@ public class MultiPartFormElement {
     {
         MultiPartFormElement element = new MultiPartFormElement();
 
-        String[] lines = elementString.split(Pattern.quote("\n\r"));
+        String[] lines = elementString.split(Pattern.quote("\r\n"));
         boolean content = false;
         StringBuilder stringBuilder = new StringBuilder();
         for ( String line : lines ){
@@ -49,7 +49,7 @@ public class MultiPartFormElement {
                     if ( dispositions.length == 1 ){
                         dispositions = part.split("=");
                     }
-                    element.headers.put(dispositions[0], dispositions[1]);
+                    element.headers.put(dispositions[0].trim(), dispositions[1]);
                 }
             }else if ( line.equals("") ){
                 content = true;
@@ -76,17 +76,24 @@ public class MultiPartFormElement {
     {
         String boundaryMarker = "boundary=";
         int boundaryStartIndex = contentType.indexOf(boundaryMarker);
-        String boundaryString = contentType.substring(boundaryStartIndex + boundaryMarker.length());
+        String boundaryString = "--" + contentType.substring(boundaryStartIndex + boundaryMarker.length()) + "\r\n";
         String[] multiPartComponents = bodyString.split(Pattern.quote(boundaryString)); //Escape the boundary so it can safely be used in regex
 
         ArrayList<MultiPartFormElement> elements = new ArrayList<>();
 
-        for ( String component : multiPartComponents ){
+        for ( int i = 1; i < multiPartComponents.length; i++ ){
+            String component = multiPartComponents[i];
             MultiPartFormElement element = MultiPartFormElement.parse(component);
             elements.add(element);
         }
 
-        return (MultiPartFormElement[])elements.toArray();
+        //Do some java stuff just to get it back in array format
+        MultiPartFormElement[] results = new MultiPartFormElement[elements.size()];
+        int i = 0;
+        for ( MultiPartFormElement e : elements ){
+            results[i++] = e;
+        }
+        return results;
     }
 
     public static HashMap<String, Object> toParams(MultiPartFormElement[] array)
