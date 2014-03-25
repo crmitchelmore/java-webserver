@@ -62,7 +62,7 @@ public class POSTHandler extends  RequestHandler
         return stringParams;
     }
 
-    public HashMap<String, Object> multiPartPostParams()
+    public HashMap<String, Object> getMultiPartPostParams()
     {
         return this.multiPartPostParams;
     }
@@ -70,7 +70,7 @@ public class POSTHandler extends  RequestHandler
     @Override
     public byte[] responseBody() throws HTTPException
     {
-        return new byte[0];
+        return this.multiPartPostParams.toString().getBytes();
     }
 
     @Override
