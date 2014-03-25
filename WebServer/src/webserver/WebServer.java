@@ -1,15 +1,8 @@
 package webserver;
 
-import in2011.http.RequestMessage;
-import in2011.http.ResponseMessage;
-import in2011.http.MessageFormatException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.*;
-import java.util.Map;
 
-import javax.xml.ws.http.HTTPException;
+import java.io.IOException;
+import java.net.*;
 
 public class WebServer {
 
