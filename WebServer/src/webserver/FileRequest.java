@@ -155,7 +155,11 @@ public class FileRequest {
 
     public void delete() throws IOException
     {
-        Files.delete(this.absolutePath);
+        try {
+            Files.delete(this.absolutePath);
+        }catch (NoSuchFileException a){
+            //Nothing to do here
+        }
     }
 
 //This is currently only used by logger so no protection is given
