@@ -37,7 +37,7 @@ public class POSTHandler extends  RequestHandler
             String contentType = requestMessage.getHeaderFieldValue(HEADER_CONTENT_TYPE);
             HashMap<String, Object> params = extractParamsFromBodyWithContentType(bodyString, contentType);
             this.multiPartPostParams.putAll(params);
-            System.out.println("Post Params: "+ this.multiPartPostParams);
+//            System.out.println("Post Params: "+ this.multiPartPostParams);
         }catch (UnsupportedEncodingException uee){
             throw new HTTPException(400); //Bad Request
         }
@@ -70,7 +70,11 @@ public class POSTHandler extends  RequestHandler
     @Override
     public byte[] responseBody() throws HTTPException
     {
-        return this.multiPartPostParams.toString().getBytes();
+        JavaWebClass webClass = Routes.route(rootDirectory, fileRequest.decodedURI, parameters, multiPartPostParams);
+        if ( webClass == null ){
+            throw new HTTPException(404);//If we can't route it then not found
+        }
+        return webClass.responseBody();
     }
 
     @Override

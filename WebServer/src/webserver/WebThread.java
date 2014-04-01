@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.file.Paths;
 import java.util.Map;
 
 /**
@@ -39,7 +40,7 @@ public class WebThread implements Runnable {
         // Declare outside of the try catch scope. Initially null, to avoid 'non-initialise' errors.
         OutputStream outputStream = null;
         InputStream inputStream = null;
-
+        String requestURI = null;
         System.out.println("Thread id: #" + Thread.currentThread().getId());
         try {
             // Attempt to initialise streams. We could do them separately and write 500 if input fails but output succeeds.
@@ -57,6 +58,7 @@ public class WebThread implements Runnable {
                 try {
                     // We create a request handler, based on the request made by the user
                     requestMessage = RequestMessage.parse(inputStream);
+                    requestURI = requestMessage.getURI();//Just grab this now so we can log, in case we throw exception somewhere.
                 } catch (MessageFormatException mfe) {
                     throw new HTTPException(400); //Bad Request
                 } catch (IOException ioe){
@@ -100,7 +102,7 @@ public class WebThread implements Runnable {
             }
 
             if ( logging ){
-                final String absoluteURI = requestHandler.absoluteURI();
+                final String absoluteURI = Paths.get(rootDir,requestURI).toString();
                 final String method = requestMessage.getMethod();
                 //Logging is done synchronously but we don't want to hold up closing this thread
                 new Thread(new Runnable() {

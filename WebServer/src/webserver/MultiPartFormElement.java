@@ -22,6 +22,10 @@ public class MultiPartFormElement {
         return key;
     }
 
+    public HashMap<String, String> getHeaders() {
+        return headers;
+    }
+
     public MultiPartFormElement()
     {
         this.headers = new HashMap<>();
@@ -49,7 +53,7 @@ public class MultiPartFormElement {
                     if ( dispositions.length == 1 ){
                         dispositions = part.split("=");
                     }
-                    element.headers.put(dispositions[0].trim(), dispositions[1]);
+                    element.headers.put(dispositions[0].trim(), dispositions[1].substring(1,dispositions[1].length()-1));//Trim whitespace from key and remove "quotes" from value
                 }
             }else if ( line.equals("") ){
                 content = true;
@@ -102,6 +106,7 @@ public class MultiPartFormElement {
         HashMap<String, Object> multiPartParams = new HashMap<>();
         for ( MultiPartFormElement element : array ){
             multiPartParams.put(element.getKey(), element.getValue());
+            multiPartParams.put(element.getKey()+"headers", element.getHeaders());
         }
         return multiPartParams;
     }

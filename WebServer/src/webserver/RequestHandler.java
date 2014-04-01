@@ -27,6 +27,7 @@ public abstract class RequestHandler
     public static final String TIMEZONE = "GMT";
     public static final String DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
     public static final String STRING_ENCODING = "UTF-8";
+    protected String rootDirectory;
     protected FileRequest fileRequest;
     protected SimpleDateFormat simpleDateFormat;
     protected RequestMessage requestMessage;
@@ -42,6 +43,7 @@ public abstract class RequestHandler
     public RequestHandler(RequestMessage requestMessage, String rootDirectory) throws HTTPException
     {
         this.requestMessage = requestMessage;
+        this.rootDirectory = rootDirectory;
         this.simpleDateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.UK);
         this.simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
         this.parameters = new HashMap<>();
