@@ -30,7 +30,7 @@ public class FileRequest {
         }
     }
 
-    //REturns yes if there is some kind of content avaialble
+    //Returns yes if there is some kind of content available
     public boolean hasContent()
     {
         try {
@@ -193,7 +193,7 @@ public class FileRequest {
     }
 
 
-    // Compile a directory listing for the direcotyr
+    // Compile a directory listing for the directory
     private String directoryStructure() throws IOException
     {
         try (  DirectoryStream<Path> stream = Files.newDirectoryStream(this.absolutePath) ){

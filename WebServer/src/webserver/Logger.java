@@ -14,8 +14,8 @@ public class Logger {
     public static void createNewLogFile(String rootDir, String logFileName) throws IOException
     {
         logFile = new FileRequest(rootDir, logFileName);
-        logFile.delete();
         //Delete old one first if there is one
+        logFile.delete();
         logFile.createFileOrFolderWithBytes(new byte[0]);
     }
 

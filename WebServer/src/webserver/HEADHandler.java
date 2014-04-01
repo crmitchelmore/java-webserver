@@ -17,6 +17,7 @@ public class HEADHandler extends RequestHandler {
         super(requestMessage, rootDir);
 
         String ifModifiedSinceString = requestMessage.getHeaderFieldValue(HEADER_IF_MODIFIED_SINCE);
+        // If there is an ifModifiedString and the requested URI would return some content usually (Covers cases such as generating directory structure and index.html)
         if ( ifModifiedSinceString != null && fileRequest.hasContent() ){
 
             try {
@@ -54,6 +55,7 @@ public class HEADHandler extends RequestHandler {
     public HashMap<String, String> buildResponseHeaders()
     {
         super.buildResponseHeaders();
+
 
         // content type
         headers.put(HEADER_CONTENT_TYPE, fileRequest.mimeType());

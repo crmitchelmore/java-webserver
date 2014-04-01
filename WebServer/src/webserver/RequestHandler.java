@@ -95,6 +95,7 @@ public abstract class RequestHandler
     protected byte[] bodyBytesFromInputStream(InputStream inputStream) throws IOException
     {
         byte[] bytes = new byte[WebServer.MAX_CONTENT_LENGTH];
+
         String contentLengthString = this.requestMessage.getHeaderFieldValue(HEADER_CONTENT_LENGTH);
         if ( contentLengthString != null ){
 
@@ -109,7 +110,7 @@ public abstract class RequestHandler
             totalBytes+=offset;
 
             System.out.println(" Finish read");
-            return  Arrays.copyOfRange(bytes, 0, totalBytes);
+            return  Arrays.copyOfRange(bytes, 0, Math.min(WebServer.MAX_CONTENT_LENGTH, totalBytes));
 
         }
         return null;
