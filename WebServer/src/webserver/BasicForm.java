@@ -1,6 +1,7 @@
 package webserver;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 
 /**
@@ -18,7 +19,7 @@ public class BasicForm extends JavaWebClass{
         String file = (String)postParams.get("afile");
         try {
             FileRequest fileRequest = new FileRequest(rootDirectory, "img/"+filename);
-            fileRequest.createFileOrFolderWithBytes(file.getBytes());
+            fileRequest.createFileOrFolderWithBytes(file.getBytes(Charset.forName("UTF-8")));//PROBLEM IS HERE GET BYTES DOES SOMETHING NOT GOOD
             FileRequest fileRequest2 = new FileRequest(rootDirectory, "profiles/"+name+".html");
 
             fileRequest2.createFileOrFolderWithBytes(generateHTMLBytes(name, filename));
