@@ -77,8 +77,9 @@ public class MultiPartFormElement {
         String boundaryMarker = "boundary=";
         int boundaryStartIndex = contentType.indexOf(boundaryMarker);
         String boundaryString = "--" + contentType.substring(boundaryStartIndex + boundaryMarker.length()) + "\r\n";
+        String endOfContentBoundaryString = "--" + contentType.substring(boundaryStartIndex + boundaryMarker.length()) + "--\r\n";
         String[] multiPartComponents = bodyString.split(Pattern.quote(boundaryString)); //Escape the boundary so it can safely be used in regex
-
+        multiPartComponents[multiPartComponents.length-1] = multiPartComponents[multiPartComponents.length-1].replaceAll(Pattern.quote(endOfContentBoundaryString),"");//Clean out that last pesky boundary!
         ArrayList<MultiPartFormElement> elements = new ArrayList<>();
 
         for ( int i = 1; i < multiPartComponents.length; i++ ){

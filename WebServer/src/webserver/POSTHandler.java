@@ -77,6 +77,7 @@ public class POSTHandler extends  RequestHandler
     public HashMap<String, String> buildResponseHeaders()
     {
         super.buildResponseHeaders();
+        headers.put(HEADER_CONTENT_TYPE, "text/html");
         return headers;
     }
 
