@@ -1,0 +1,58 @@
+
+Report
+2a. Describe in a few words the cases where you have used the different status codes.
+
+We use the status codes as high up the abstraction as possible either in WebThread or in the RequestHandler subclasses. Some of the advanced features tempted us in to using an extended set of status codes.
+
+
+200 GET & HEAD requests
+201 PUT & POST requests
+304 GET & HEAD requests if there are no changes
+400 When URI is bad or message is malformed
+403 When URI is not a child of rootDir
+404 GET & HEAD & POST when file or route isn’t found
+500 IOExceptions
+501 If the request is not POST, PUT, GET or HEAD
+505 If the HTTP Version is not >= 1.1
+
+409 When trying to PUT or POST to a uri that already exists
+415 When POSTing with an unsupported content type
+411 If content length isn’t specified in PUT requests
+413 If the body of the PUT request is too large
+414 If the given URI is too long
+
+
+
+2b.Whether you have addressed any of the advanced features and where in the code
+(e.g. file name, function name) you developed the corresponding code. Have you
+encountered any challenges?
+
+Client-side cacheing
+This is implemented primarily in the ‘HEADHandler : Constructor’ class which ‘GETHandler’ subclasses to get the functionality. The challenges were parsing the date and confirming that the URI resolves to some content (and providing the correct last modified date for that content). The date could be from a file or file tree, fortunately the file system does most the work of resolving these dates to the correct level. Date format and timezone are controllable from RequestHandler constants.
+Content length field
+This is implemented in HEADHandler : buildResponseHeaders() and PUTHandler : constructor and the FileRequest : bodyBytesFromInputStream() class. When trying to work out how the files should be written using nio I had trouble with reading large files in one chunk. There was cap of 130k on the number of bytes per read. I figured out that I needed to use a buffer to read it progressively (in a loop) but now it started blocking the thread indefinitely. The problem turned out to be trying to read in the loop after the stream had finished. 
+Content type field
+
+This is implemented in HEADHandler : buildResponseHeaders() and in the fileRequest method. Similar to content length the challenge was getting the correct file type for the directory and index.html when present. There is a clear opportunity for improvement by refactoring these similar pieces of login in to one method.
+Directory Get Requests
+Implemented in FileRequest: fileBytes(), directoryStructure() and indexPage(). This task went well, there were some issues with cross platform compatibility and not showing hidden and symbolic files. Generating the correct path extensions for the links also took some iteration.
+
+%-hex-hex escapes in URIs
+Feature implemented in RequestHandler : Constructor. First we extract the path parameters in to a hash map. Next, we use URLDecoder to do the leg work with UTF-8 encoding which ASCII is a subset of. This can be configured in the static constants of the class.
+
+
+
+c. Optional!!! If and only if you have implemented the POST method for bonus marks
+then: you are asked to write no more than an additional 400 words where you
+describe how you implemented the POST method, the challenges that you
+encountered and pointers to the code where you implement this method.
+
+See the post_tests.html(in the data folder) for demo.
+
+We decided to implement the POST method to accept two types of content "application/x-www-form-urlencoded” and "multipart/form-data”. During the implementation I refactored some of the methods used in other requests to provide a better level of abstraction and less code duplication. After the generic setup, done in the RequestHandler, we read the input stream. The next step in the POST constructor is to work out the provided content type and if we can handle it. If we can, we expect to receive a hash map of the given parameters or data. The hash map is simply a wrapper and would not be extensible to a thorough implementation. If the content type is url encoded we reuse the mouthed used to extract parameters from the URI and that’s all there is to it. 
+
+The trickier case is the multipart form data and I thought it sensible to extract the functionality in to a helper class,  MultiPartFormElement. The main method of interest is the parse(byte[], String) method which returns an array of MultiPartFormElements. Each part of the multipart form is separated by a boundary which is provided in the content type header of the request and must have “- -“ prepended to it. We use the boundary to split the body of the request and send that section, as a string encoded using the non lossy ISO8859.1, off to be parsed by a private parse method, the reason it is useful to do this will become apparent in the next paragraph.
+
+The internal parse method splits the data in to lines using "\r\n” as a line marker. The format of the part is similar to a http request; it has headers then a new line and then a body. There is one unique header, that’s always the first line, which contains the "Content-Disposition:”, which is similar to content type, and optionally is followed by a filename. After processing this line we gather any other headers in to a hash map. As soon as we encounter a empty line I switch a flag to true to let the loop know that the rest of the message is the content. Then because this is just raw data I compound the rest back in to a single string which can be re encoded as a byte stream using IOS8859.1 again.
+
+Before returning there are a few final checks to make. The content type of the part could actually be of type "multipart/mixed” which takes the same format as the body of a "multipart/form-data”. Now, because we extracted this part of the parsing, we can just recurse with the whole string content and we will end up with a value in the original hash map of type MultiPartFormElement. The final step is to put all of the resultant objects in to an array and return it for whatever logic the application wants to use. For now, I use a simple routes file that will match paths however we choose and instantiate a class, passing in the parameters, which will generate some output. In the example it takes a simple html form with text and image input then creates a profile page(most error handling has been omitted for simplicity).
