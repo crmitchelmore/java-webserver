@@ -50,7 +50,11 @@ public class FileRequest {
         }
 
         if ( fileExists() ){
-            return Files.readAllBytes(this.absolutePath);
+            if ( Files.isReadable(this.absolutePath) ){
+                return Files.readAllBytes(this.absolutePath);
+            }else{
+                throw new SecurityException();
+            }
         }
 
         if ( isDirectory() ){
@@ -133,7 +137,7 @@ public class FileRequest {
 
         // If it's a directory and there's no index page then it's the html we build
         if ( isDirectory() && file == null ){
-            return "text/html";
+            return "text/html; charset=UTF-8";
         }
 
         try {
@@ -148,6 +152,13 @@ public class FileRequest {
             // If we haven't had any luck so far try guessing the content type
             String fileName = file == null ? this.decodedURI : file.getPath();
             type = URLConnection.guessContentTypeFromName(fileName);
+            if ( type == null ){
+                type = "application/unknown";
+            }
+        }
+        
+        if ( type.startsWith("text") ){
+            type = type + "; charset=UTF-8";
         }
         return type;
     }

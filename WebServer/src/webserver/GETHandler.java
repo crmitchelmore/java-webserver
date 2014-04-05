@@ -26,6 +26,8 @@ public class GETHandler extends HEADHandler {
             }
             return bytes;
 
+        }catch (SecurityException se){
+            throw new HTTPException(403);
         }catch (IOException ioe){
             throw new HTTPException(500); //Internal server error
         }
