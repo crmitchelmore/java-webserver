@@ -9,7 +9,7 @@ public class WebServer {
 
     public static final int MAX_CONTENT_LENGTH = 1024*1024;
     public static final String LOG_FILE_NAME = "webserverIN2011.log";
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         String usage = "Usage: java webserver.WebServer <port-number> <root-dir> (\"0\" | \"1\")";
 
         if ( args.length != 3 ) {
@@ -30,6 +30,8 @@ public class WebServer {
         } else {
             throw new Error(usage);
         }
+        String loggingString = logging ? "with" : "without";
+        System.out.println("Starting server at - "+rootDir+":"+port+" "+loggingString+" logging");
         WebServer server = new WebServer(port, rootDir, logging);
         server.start();
     }
@@ -50,19 +52,27 @@ public class WebServer {
      * @throws IOException
      */
     static int c = 0;
-    public void start() throws IOException
+    public void start() throws Exception
     {
-        ServerSocket serverSock = new ServerSocket(port);
+        ServerSocket serverSock = null;
+        try {
+            serverSock = new ServerSocket(port);
+        } catch (BindException b){
+            System.out.println("You already have a server running. Shut it down first");
+            //throw new Exception();
+        }
         if ( logging ){
             Logger.createNewLogFile(rootDir, LOG_FILE_NAME);
         }
-        while (true) {
-            Socket socket = serverSock.accept(); //Maybe catch this and recover sooner?
-            System.out.println(c++);
-            WebThread webThread = new WebThread(socket, rootDir, logging);
-            Thread t = new Thread(webThread);
-            t.start();
-        }
+    
+            while (true) {
+                Socket socket = serverSock.accept(); //Maybe catch this and recover sooner?
+                System.out.println(c++);
+                WebThread webThread = new WebThread(socket, rootDir, logging);
+                Thread t = new Thread(webThread);
+                t.start();
+            }
+        
     }
 
 
