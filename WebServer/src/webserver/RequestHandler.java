@@ -107,7 +107,7 @@ public abstract class RequestHandler
             int totalBytes = 0;
 
             final int PageSize = 16384; //Have to read in pages because large files don't fit in buffer otherwise
-            while ( (offset = inputStream.read(bytes, totalBytes, PageSize)) <= PageSize ){
+            while ( (offset = inputStream.read(bytes, totalBytes, PageSize)) == PageSize ){
                 totalBytes+=offset;
             }
             totalBytes+=offset;
