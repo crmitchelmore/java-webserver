@@ -243,17 +243,13 @@ public class FileRequest {
                 // Add 'Dir' for directories
                 String directory = Files.isDirectory(file) ? "Dir: " : "";
 
-                // Don't show sym links or hidden files
-                String operatingSystem = System.getProperty("os.name");
-                boolean showFile = true;
-                if ( operatingSystem.toLowerCase().contains("windows") ){
-
-                     DosFileAttributes dosFileAttributes = Files.readAttributes(resolved, DosFileAttributes.class);
-                     showFile =  !(dosFileAttributes.isSystem() || dosFileAttributes.isHidden());
-                }else {
-                     showFile =  !(Files.isSymbolicLink(resolved) && Files.isHidden(resolved));
-                }
-                if ( showFile ){
+               // Don't show sym links or hidden files
+                try{
+                     if(!(Files.isSymbolicLink(resolved) && Files.isHidden(resolved)))
+                    {
+                        builder.append(directory + "<a href=\"/" + resolvedTarget.toString() + "\">" + resolved.toString() + "</a><br>");
+                    }
+                } catch(Exception e) { //Strange windows exception. Couldn't debug it so this is the work around...
                     builder.append(directory + "<a href=\"/" + resolvedTarget.toString() + "\">" + resolved.toString() + "</a><br>");
                 }
 
