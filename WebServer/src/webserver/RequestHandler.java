@@ -100,14 +100,14 @@ public abstract class RequestHandler
         byte[] bytes = new byte[WebServer.MAX_CONTENT_LENGTH];
 
         String contentLengthString = this.requestMessage.getHeaderFieldValue(HEADER_CONTENT_LENGTH);
-        if ( contentLengthString != null ){
+        if ( contentLengthString != null && Integer.parseInt(contentLengthString) > 0 ){
 
             System.out.print("Start read...");
             int offset = 0;
             int totalBytes = 0;
 
             final int PageSize = 16384; //Have to read in pages because large files don't fit in buffer otherwise
-            while ( (offset = inputStream.read(bytes, totalBytes, PageSize)) == PageSize ){
+            while ( (offset = inputStream.read(bytes, totalBytes, PageSize)) <= PageSize ){
                 totalBytes+=offset;
             }
             totalBytes+=offset;
