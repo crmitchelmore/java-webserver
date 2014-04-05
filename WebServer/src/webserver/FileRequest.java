@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.nio.file.*;
+import java.nio.file.attribute.DosFileAttributes;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -243,7 +244,16 @@ public class FileRequest {
                 String directory = Files.isDirectory(file) ? "Dir: " : "";
 
                 // Don't show sym links or hidden files
-                if ( !Files.isSymbolicLink(resolved) && !Files.isHidden(resolved) ){
+                String operatingSystem = System.getProperty("os.name");
+                boolean showFile = true;
+                if ( operatingSystem.toLowerCase().contains("windows") ){
+
+                     DosFileAttributes dosFileAttributes = Files.readAttributes(resolved, DosFileAttributes.class);
+                     showFile =  !(dosFileAttributes.isSystem() || dosFileAttributes.isHidden());
+                }else {
+                     showFile =  !(Files.isSymbolicLink(resolved) && Files.isHidden(resolved));
+                }
+                if ( showFile ){
                     builder.append(directory + "<a href=\"/" + resolvedTarget.toString() + "\">" + resolved.toString() + "</a><br>");
                 }
 
