@@ -1,0 +1,32 @@
+<html>
+<head>
+<title>POST test forms</title>
+</head>
+<body>
+<h1>Multi part form</h1>
+<p>Select a name and pic a profile picture to create a profile</p>
+<form method="POST" action="multipartform.ja" enctype="multipart/form-data">
+<label for="aname">Enter your name</label>  <input type="text" name="aname" placeholder="e.g. Van Jacobson"><br>
+<label for="afile">Select your picture</label>  <input type="file" name="afile" placeholder="Your photo"><br>
+<input type="submit" value="Create Profile">
+</form>
+<br>
+<br>
+<h1>URL encoded form</h1>
+<p>Enter your name and likes then hit go </p>
+<form method="POST" action="urlencodedform.ja">
+<label for="aname">Enter your name</label>  <input type="text" name="aname" placeholder="e.g. Van Jacobson"><br>
+<label for="alike">Enter something you like</label>  <input type="text" name="alike" placeholder="e.g. Saving the internet"><br>
+<label for="acount">How much do you like it</label>
+<select name="acount">
+  <option value="1">Not that much</option>
+  <option value="2">Some</option>
+  <option value="3">Enough</option>
+  <option value="4">A lot</option>
+  <option value="5">Loads!</option>
+</select><br>
+
+<input type="submit" value="Go!">
+</form>
+<body>
+</html>

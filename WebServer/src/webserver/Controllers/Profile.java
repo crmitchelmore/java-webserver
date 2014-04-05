@@ -1,17 +1,20 @@
-package webserver;
+package webserver.Controllers;
 
+import webserver.FileRequest;
+import webserver.MultiPartFormElement;
+
+import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 
 /**
  * Created by cmitchelmore on 01/04/2014.
  */
-public class BasicForm extends JavaWebClass{
+public class Profile extends JavaWebController {
 
     private String responseString;
 
-    public BasicForm(String rootDirectory, HashMap<String, String> urlParams, HashMap<String, Object> postParams){
+    public Profile(String rootDirectory, HashMap<String, String> urlParams, HashMap<String, Object> postParams){
         super(rootDirectory, urlParams, postParams);
         //Do stuff!
         String filename = (String)((HashMap<String, Object>)postParams.get("afileheaders")).get("filename");
@@ -19,16 +22,16 @@ public class BasicForm extends JavaWebClass{
         String file = (String)postParams.get("afile");
         try {
             FileRequest fileRequest = new FileRequest(rootDirectory, "img/"+filename);
-            fileRequest.createFileOrFolderWithBytes(file.getBytes(Charset.forName("UTF-8")));//PROBLEM IS HERE GET BYTES DOES SOMETHING NOT GOOD
+            byte[] a =  file.getBytes(MultiPartFormElement.ISO_8859_1);
+            fileRequest.createFileOrFolderWithBytes(a);
             FileRequest fileRequest2 = new FileRequest(rootDirectory, "profiles/"+name+".html");
 
             fileRequest2.createFileOrFolderWithBytes(generateHTMLBytes(name, filename));
             responseString = "Profile created: <a href=\"/profiles/"+name+".html\">"+name+"</a>";
         }catch (SecurityException e){
-            e.printStackTrace();
-            //We wont be looking in the wrong place here so no worries
+            throw new HTTPException(409);//conflict
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new HTTPException(500);//o dear
         }
 
 

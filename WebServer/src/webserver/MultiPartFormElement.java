@@ -1,5 +1,6 @@
 package webserver;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
@@ -11,9 +12,8 @@ public class MultiPartFormElement {
 
     private Object value;
     private String key;
-
     private HashMap<String, String>headers;
-
+    public static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
     public Object getValue() {
         return value;
     }
@@ -66,7 +66,7 @@ public class MultiPartFormElement {
         //Multipart forms can include multi parts in them so we recurse
         String contentType = element.headers.get(RequestHandler.HEADER_CONTENT_TYPE);
         if (  contentType != null && contentType.equals("multipart/mixed") ){
-            element.value = MultiPartFormElement.parse(stringBuilder.toString(), contentType);
+            element.value = MultiPartFormElement.parse(stringBuilder.toString().getBytes(ISO_8859_1), contentType);
         }else{
             element.value = stringBuilder.toString();
         }
@@ -76,14 +76,25 @@ public class MultiPartFormElement {
     }
 
 
-    public static MultiPartFormElement[] parse(String bodyString, String contentType)
+    public static MultiPartFormElement[] parse(byte[] bodyBytes, String contentType)
     {
         String boundaryMarker = "boundary=";
         int boundaryStartIndex = contentType.indexOf(boundaryMarker);
         String boundaryString = "--" + contentType.substring(boundaryStartIndex + boundaryMarker.length()) + "\r\n";
         String endOfContentBoundaryString = "--" + contentType.substring(boundaryStartIndex + boundaryMarker.length()) + "--\r\n";
-        String[] multiPartComponents = bodyString.split(Pattern.quote(boundaryString)); //Escape the boundary so it can safely be used in regex
+
+
+
+
+
+        Pattern pattern = Pattern.compile(boundaryString, Pattern.LITERAL);
+        String[] multiPartComponents = pattern.split(new String(bodyBytes, ISO_8859_1), -1); //Split using ISO_8859_1 to preserve encoding
+
         multiPartComponents[multiPartComponents.length-1] = multiPartComponents[multiPartComponents.length-1].replaceAll(Pattern.quote(endOfContentBoundaryString),"");//Clean out that last pesky boundary!
+
+
+
+
         ArrayList<MultiPartFormElement> elements = new ArrayList<>();
 
         for ( int i = 1; i < multiPartComponents.length; i++ ){
@@ -110,4 +121,8 @@ public class MultiPartFormElement {
         }
         return multiPartParams;
     }
+
+
+
+
 }

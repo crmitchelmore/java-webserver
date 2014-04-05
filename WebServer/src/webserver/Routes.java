@@ -1,5 +1,9 @@
 package webserver;
 
+import webserver.Controllers.JavaWebController;
+import webserver.Controllers.Profile;
+import webserver.Controllers.Lines;
+
 import java.util.HashMap;
 
 /**
@@ -7,11 +11,13 @@ import java.util.HashMap;
  */
 public class Routes {
 
-    public static JavaWebClass route(String rootDirectory, String uri, HashMap<String, String> urlParams, HashMap<String, Object> postParams)
+    public static JavaWebController route(String rootDirectory, String uri, HashMap<String, String> urlParams, HashMap<String, Object> postParams)
     {
         //This would usually route to scripts but as we are using java we route to classes!
-        if ( uri.equals("form.ja") ){
-            return new BasicForm(rootDirectory,urlParams, postParams);
+        if ( uri.equals("multipartform.ja") ){
+            return new Profile(rootDirectory,urlParams, postParams);
+        }else if ( uri.equals("urlencodedform.ja") ){
+            return new Lines(rootDirectory,urlParams, postParams);
         }
 
         return null;
